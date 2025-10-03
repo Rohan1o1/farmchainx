@@ -11,42 +11,51 @@ import com.farmchainx.farmchainx.model.User;
 import com.farmchainx.farmchainx.repository.RoleRepository;
 import com.farmchainx.farmchainx.repository.UserRepository;
 
-import lombok.RequiredArgsConstructor;
-
 @Service
-@RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    
+
     public AuthService(UserRepository userRepository, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
         this.userRepository = userRepository;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
     }
 
-    public String register(RegisterRequest request) {
-    
-        if(userRepository.findByEmail(request.getEmail()).isPresent()) {
-            return "Email already exists!";
+    public String register(RegisterRequest register) {
+
+        //git testing update
+        if (userRepository.findByEmail(register.getEmail()).isPresent()) {
+            return "Email is already taken";
         }
 
-        
-        Role userRole = roleRepository.findByRoleName("ROLE_USER")
-                         .orElseThrow(() -> new RuntimeException("Role not found"));
+       
+        String chosenRole = register.getRole().toUpperCase();
 
-   
+        
+        if (chosenRole.equals("ADMIN")) {
+            return "Cannot register as Admin. Contact system administrator.";
+        }
+
+      
+        String roleName = "ROLE_" + chosenRole;
+
+        
+        Role userRole = roleRepository.findByRoleName(roleName)
+                .orElseThrow(() -> new RuntimeException("Role not found: " + roleName));
+
+        
         User user = new User();
-        user.setName(request.getName());
-        user.setEmail(request.getEmail());
-        user.setPassword(passwordEncoder.encode(request.getPassword())); 
-        user.setRoles(Set.of(userRole)); 
-   
+        user.setName(register.getName());
+        user.setEmail(register.getEmail());
+        user.setPassword(passwordEncoder.encode(register.getPassword()));
+        user.setRoles(Set.of(userRole));
+
+     
         userRepository.save(user);
 
-        return "User registered successfully!";
+        return "User registered successfully as " + chosenRole;
     }
 }
-
