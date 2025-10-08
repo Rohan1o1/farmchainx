@@ -2,7 +2,6 @@ package com.farmchainx.farmchainx.configuration;
 
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
-
 import com.farmchainx.farmchainx.model.Role;
 import com.farmchainx.farmchainx.repository.RoleRepository;
 
@@ -18,19 +17,22 @@ public class DataSeeder implements CommandLineRunner {
     @Override
     public void run(String... args) throws Exception {
 
-        
-        String[] roles = {"ROLE_CONSUMER", "ROLE_FARMER", "ROLE_DISTRIBUTOR", "ROLE_ADMIN"};
+        String[] roles = {
+            "ROLE_CONSUMER",
+            "ROLE_FARMER",
+            "ROLE_DISTRIBUTER",
+            "ROLE_RETAILER",
+            "ROLE_ADMIN"
+        };
 
         for (String roleName : roles) {
-       
             if (!roleRepository.existsByRoleName(roleName)) {
                 Role role = new Role();
                 role.setRoleName(roleName);
                 roleRepository.save(role);
-                System.out.println(roleName + " created successfully");
             }
         }
 
-        System.out.println("All fixed roles are ensured in the database.");
+        System.out.println("✅ Role seeding completed successfully!");
     }
 }
