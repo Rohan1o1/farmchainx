@@ -4,7 +4,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.farmchainx.farmchainx.dto.RegisterRequest;
-import com.farmchainx.farmchainx.dto.LoginRequest;
+
 import com.farmchainx.farmchainx.model.Role;
 import com.farmchainx.farmchainx.model.User;
 import com.farmchainx.farmchainx.repository.RoleRepository;
@@ -62,20 +62,5 @@ public class AuthService {
     }
 
     
-    public String login(LoginRequest request) {
-        try {
-            User user = userRepository.findByEmail(request.getEmail())
-                    .orElseThrow(() -> new RuntimeException("Invalid email or password"));
-
-            if (!passwordEncoder.matches(request.getPassword(), user.getPassword())) {
-                throw new RuntimeException("Invalid email or password");
-            }
-
-            return "✅ Login successful for " + user.getEmail();
-
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            return "❌ Login failed: " + e.getMessage();
-        }
-    }
+ 
 }
