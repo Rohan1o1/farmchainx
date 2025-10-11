@@ -6,6 +6,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.farmchainx.farmchainx.dto.AuthResponse;
+import com.farmchainx.farmchainx.dto.LoginRequest;
 import com.farmchainx.farmchainx.dto.RegisterRequest;
 import com.farmchainx.farmchainx.service.AuthService;
 
@@ -23,6 +25,11 @@ public class AuthController {
 	public ResponseEntity<String> register(@RequestBody RegisterRequest register){
 		return ResponseEntity.ok(authService.register(register));
 		
+	}
+	
+	@PostMapping("/login")
+	public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest login){
+		return ResponseEntity.ok(authService.login(login));
 	}
 
 }
