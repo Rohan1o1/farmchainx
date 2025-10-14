@@ -1,6 +1,9 @@
 package com.farmchainx.farmchainx.model;
 
 import jakarta.persistence.*;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -27,6 +30,11 @@ public class User {
 			inverseJoinColumns = @JoinColumn(name="role_id")
 			)
 	private Set<Role> roles;
+	
+	@OneToMany(mappedBy = "farmer", cascade = CascadeType.ALL, orphanRemoval = true)
+	
+	private List<Product> products = new ArrayList<>();
+	
 
 	public long getId() {
 		return id;
@@ -67,19 +75,16 @@ public class User {
 	public void setRoles(Set<Role> roles) {
 		this.roles = roles;
 	}
-	
-	
-	
 
+	public List<Product> getProducts() {
+		return products;
+	}
+
+	public void setProducts(List<Product> products) {
+		this.products = products;
+	}
 	
 	
-	
-
-	  
-
-	
-
-
 	
 	
 }
