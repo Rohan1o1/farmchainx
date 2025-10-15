@@ -10,41 +10,61 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    // Must be at least 32 chars for HS256
-    private final String SECRET_KEY = "farmchainx_secret_key_1234567890!!farm"; 
-    private final long EXPIRATION = 1000 * 60 * 60; // 1 hour validity
+    private final String SECRET_KEY = "farmchainx_secret_key_1234567890!!farm";
+    private final long EXPIRATION = 1000 * 60 * 60; // 1 hour
 
     private Key getSigningKey() {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    // 1. Generate JWT token
-    public String generateToken(String email) {
+    // ✅ Generate token with email, role, and userId
+    public String generateToken(String email, String role, Long userId) {
         return Jwts.builder()
-                .setSubject(email)                // put email inside token
-                .setIssuedAt(new Date())          // issued time
-                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION)) // expiry
-                .signWith(getSigningKey(), SignatureAlgorithm.HS256) // sign with key
+                .setSubject(email)
+                .claim("role", role)
+                .claim("userId", userId)
+                .setIssuedAt(new Date())
+                .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
+                .signWith(getSigningKey(), SignatureAlgorithm.HS256)
                 .compact();
     }
 
-    // 2. Extract email from token
-    public String extractEmail(String token) {
+    // Extract email (subject)
+    public String extractUsername(String token) {
         return Jwts.parserBuilder()
-                .setSigningKey(getSigningKey())   // verify signature
+                .setSigningKey(getSigningKey())
                 .build()
                 .parseClaimsJws(token)
                 .getBody()
                 .getSubject();
     }
 
-    // 3. Validate token
+    // Extract role
+    public String extractRole(String token) {
+        return (String) Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("role");
+    }
+
+    // Extract userId
+    public Long extractUserId(String token) {
+        return ((Number) Jwts.parserBuilder()
+                .setSigningKey(getSigningKey())
+                .build()
+                .parseClaimsJws(token)
+                .getBody()
+                .get("userId")).longValue();
+    }
+
+    // Validate token
     public boolean validateToken(String token, String email) {
-        String extractedEmail = extractEmail(token);
+        String extractedEmail = extractUsername(token);
         return (extractedEmail.equals(email) && !isExpired(token));
     }
 
-    // Check expiry
     private boolean isExpired(String token) {
         Date exp = Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())

@@ -35,6 +35,8 @@ public class User {
 	
 	private List<Product> products = new ArrayList<>();
 	
+	
+	
 
 	public long getId() {
 		return id;
