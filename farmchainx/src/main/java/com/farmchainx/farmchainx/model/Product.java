@@ -10,11 +10,18 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
+import lombok.AllArgsConstructor;
 import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
 
 @Entity
 @Table(name="products")
-@Builder
+
+@AllArgsConstructor
+@NoArgsConstructor
+@Data
+@Builder(toBuilder = true)
 public class Product {
 	
 	@Id
@@ -37,129 +44,8 @@ public class Product {
 	
 	private Double confidenceScore;
 	
-    public Product() {}
+
+
 	
-	
-	public Product(Long id, String cropName, String soilType, String pesticides, LocalDate harverstDate,
-			String gpsLocation, String imagePath, String qualityGrade, Double confidenceScore, User farmer) {
-		super();
-		this.id = id;
-		this.cropName = cropName;
-		this.soilType = soilType;
-		this.pesticides = pesticides;
-		this.harvestDate = harverstDate;
-		this.gpsLocation = gpsLocation;
-		this.imagePath = imagePath;
-		this.qualityGrade = qualityGrade;
-		this.confidenceScore = confidenceScore;
-		this.farmer = farmer;
-	}
-
-
-
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "farmer_id")
-	private User farmer;
-
-	public Long getId() {
-		return id;
-	}
-
-
-	public void setId(Long id) {
-		this.id = id;
-	}
-
-
-	public String getCropName() {
-		return cropName;
-	}
-
-
-	public void setCropName(String cropName) {
-		this.cropName = cropName;
-	}
-
-
-	public String getSoilType() {
-		return soilType;
-	}
-
-
-	public void setSoilType(String soilType) {
-		this.soilType = soilType;
-	}
-
-
-	public String getPesticides() {
-		return pesticides;
-	}
-
-
-	public void setPesticides(String pesticides) {
-		this.pesticides = pesticides;
-	}
-
-
-	public LocalDate getHarvestDate() {
-		return harvestDate;
-	}
-
-
-	public void setHarvestDate(LocalDate harvestDate) {
-		this.harvestDate = harvestDate;
-	}
-
-
-	public String getGpsLocation() {
-		return gpsLocation;
-	}
-
-
-	public void setGpsLocation(String gpsLocation) {
-		this.gpsLocation = gpsLocation;
-	}
-
-
-	public String getImagePath() {
-		return imagePath;
-	}
-
-
-	public void setImagePath(String imagePath) {
-		this.imagePath = imagePath;
-	}
-
-
-	public String getQualityGrade() {
-		return qualityGrade;
-	}
-
-
-	public void setQualityGrade(String qualityGrade) {
-		this.qualityGrade = qualityGrade;
-	}
-
-
-	public Double getConfidenceScore() {
-		return confidenceScore;
-	}
-
-
-	public void setConfidenceScore(Double confidenceScore) {
-		this.confidenceScore = confidenceScore;
-	}
-
-
-	public User getFarmer() {
-		return farmer;
-	}
-
-
-	public void setFarmer(User farmer) {
-		this.farmer = farmer;
-	}
-
 	
 }

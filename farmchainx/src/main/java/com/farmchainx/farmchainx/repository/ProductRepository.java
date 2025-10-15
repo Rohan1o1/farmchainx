@@ -9,5 +9,5 @@ import com.farmchainx.farmchainx.model.User;
 
 public interface ProductRepository extends JpaRepository<Product, Long> {
  
-	List<Product> findByFarmer(User farmer);
+	List<Product> findByFarmer(Long farmerId);
 }
