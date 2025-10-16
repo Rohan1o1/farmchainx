@@ -1,43 +1,91 @@
-🌾 FarmChainX — Smart Agriculture Platform (Work in Progress)
+FarmChainX
 
-FarmChainX is a backend project built using Spring Boot that aims to digitalize the agricultural supply chain by connecting farmers, buyers, and suppliers on a single platform.
+Status: Work in Progress (WIP)
 
-The goal of the project is to make farm trading easier, transparent, and efficient — allowing farmers to upload their products, buyers to place orders, and admins to monitor activities — all through secure APIs.
+🚀 Overview
 
-We are building this as a full-featured backend system with user authentication, product management, and order handling. The project follows a clean three-layer architecture (Controller → Service → Repository) and uses JWT for secure user access.
+FarmChainX is an AI and blockchain-powered supply chain platform built for the agriculture industry.
+It ensures transparency, traceability, and authenticity for farm products — from the farmer’s field to the consumer’s hands.
+The project combines Spring Boot for backend APIs, blockchain for tamper-proof records, and AI for quality checks and demand forecasting.
 
+🌾 How It Works
 
+👨‍🌾 Farmer
 
-🧩 Technology Stack
+Registers and uploads product details such as name, category, quantity, harvest date, and photos.
 
-Backend Framework: Spring Boot
+Each product batch receives a unique blockchain entry for traceability.
 
-Security: Spring Security with JWT Authentication
+Can view AI-based quality scores generated from uploaded images.
 
-Database: MySQL (via Spring Data JPA & Hibernate)
+🚚 Distributor
 
-Build Tool: Maven
+Views available products from farmers and purchases them in batches.
 
-Language: Java 17
+Updates transportation and storage details, recorded immutably on the blockchain.
 
-Tools: Postman, STS / IntelliJ, Lombok
+Uses AI-based demand forecasts to optimize logistics and inventory.
 
+🧾 Quality Auditor
 
-🧱 Current Progress
+Reviews product and batch details submitted by farmers and distributors.
 
-✅ User registration and login with JWT
+Uses blockchain logs to verify authenticity and detect tampering.
 
-✅ Product upload using form-data
+Approves or flags batches based on AI-assisted quality results.
 
-🚧 Order and Payment modules under development
+🛒 Retailer / Consumer
 
-🚧 Dashboard & Analytics planned
+Can track a product’s complete journey from farm to shelf.
 
+Verifies product authenticity, quality, and sustainability data stored on blockchain.
 
-📅 Project Status
+Gains trust and confidence in organic and eco-friendly products.
 
-Work in Progress — expected to be completed soon.
-Focused on building a secure, scalable, and production-ready backend.
+⚙️ Features
 
-Work in Progress — expected to be completed soon.
-Focused on building a secure, scalable, and production-ready backend.
+Product and batch registration with complete origin details
+
+Blockchain-based tracking for authenticity and transparency
+
+AI-driven product quality assessment and demand forecasting
+
+Secure JWT authentication and role-based access control
+
+RESTful APIs following clean controller–service–repository architecture
+
+🧰 Tech Stack
+
+Backend: Java, Spring Boot, Spring Data JPA
+
+Database: MySQL
+
+Blockchain: Hyperledger / Private Ledger (Prototype)
+
+AI Module: Python (Flask / FastAPI microservice)
+
+Security: Spring Security + JWT
+
+Tools: Maven, Lombok, Postman, Docker
+
+🗺️ Roadmap
+
+ Integrate AI model for real-time quality checking
+
+ Implement blockchain ledger for transaction traceability
+
+ Build React-based frontend dashboard for all user roles
+
+ Add CI/CD pipelines and Dockerized deployment
+
+👨‍💻 Roles Summary
+Role	Capabilities
+Farmer	Add products, upload batches, view AI quality report
+Distributor	Purchase batches, track logistics, forecast demand
+Auditor	Verify authenticity, validate blockchain events
+Retailer / Consumer	Track product journey and verify origin
+
+📫 Contact
+
+Maintainer: Your Name
+Email: ashwanth.jayakumar.gowri@gmail.com
