@@ -35,10 +35,10 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-            // Disable CSRF because we use JWT, not cookies
+          
             .csrf(csrf -> csrf.disable())
 
-            // Define access rules
+           
             .authorizeHttpRequests(auth -> auth
                 .requestMatchers("/api/auth/**").permitAll()          // allow register/login
                 .requestMatchers("/api/products/**").hasAuthority("ROLE_FARMER") // only farmers can access
