@@ -13,6 +13,7 @@ import com.farmchainx.farmchainx.model.Product;
 import com.farmchainx.farmchainx.model.User;
 import com.farmchainx.farmchainx.repository.UserRepository;
 import com.farmchainx.farmchainx.service.ProductService;
+import com.farmchainx.farmchainx.service.QrService;
 
 @RestController
 @RequestMapping("/api/products")
@@ -20,10 +21,12 @@ public class ProductController {
 
     private final ProductService productService;
     private final UserRepository userRepository;
+    private final QrService qrService;
 
-    public ProductController(ProductService productService, UserRepository userRepository) {
+    public ProductController(ProductService productService, UserRepository userRepository, QrService qrService) {
         this.productService = productService;
         this.userRepository = userRepository;
+        this.qrService = qrService;
     }
 
   
@@ -90,5 +93,10 @@ public class ProductController {
             @RequestParam(required = false) LocalDate endDate
     ) {
         return productService.filterProducts(cropName, endDate);
+    }
+    
+    @PostMapping("/{id}/qrcode")
+    public String generateProductQrCode(@PathVariable Long id) {
+    	return qrService.generateProductQr(id);
     }
 }
