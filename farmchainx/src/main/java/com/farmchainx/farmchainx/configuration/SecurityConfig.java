@@ -13,6 +13,8 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 
 import com.farmchainx.farmchainx.jwt.JwtAuthenticationFilter;
 
+
+
 @Configuration
 public class SecurityConfig {
 
