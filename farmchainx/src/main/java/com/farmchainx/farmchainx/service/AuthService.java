@@ -1,4 +1,3 @@
-
 package com.farmchainx.farmchainx.service;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -43,13 +42,15 @@ public class AuthService {
 
             String roleInput = request.getRole().toUpperCase();
 
+            // prevent direct admin sign-up
             if (roleInput.equals("ADMIN") || roleInput.equals("ROLE_ADMIN")) {
                 return "🚫 Cannot register as Admin!";
             }
 
             String chosenRole = roleInput.startsWith("ROLE_") ? roleInput : "ROLE_" + roleInput;
 
-            Role userRole = roleRepository.findByRoleName(chosenRole)
+            // ✅ changed from findByRoleName → findByName
+            Role userRole = roleRepository.findByName(chosenRole)
                     .orElseThrow(() -> new RuntimeException("Role not found: " + chosenRole));
 
             User user = new User();
@@ -76,7 +77,8 @@ public class AuthService {
             throw new RuntimeException("Invalid password");
         }
 
-        String role = user.getRoles().iterator().next().getRoleName();
+        // ✅ changed from getRoleName → getName
+        String role = user.getRoles().iterator().next().getName();
 
         String token = jwtUtil.generateToken(user.getEmail(), role, user.getId());
 

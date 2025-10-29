@@ -26,9 +26,10 @@ public class DataSeeder implements CommandLineRunner {
         };
 
         for (String roleName : roles) {
-            if (!roleRepository.existsByRoleName(roleName)) {
+            // ✅ use the correct repository method and field name
+            if (!roleRepository.existsByName(roleName)) {
                 Role role = new Role();
-                role.setRoleName(roleName);
+                role.setName(roleName); // ✅ correct setter for Role.name
                 roleRepository.save(role);
             }
         }

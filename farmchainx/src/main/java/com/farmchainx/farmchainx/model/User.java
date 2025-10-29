@@ -1,92 +1,122 @@
 package com.farmchainx.farmchainx.model;
 
 import jakarta.persistence.*;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 @Entity
-@Table(name = "user")
+@Table(name = "users") 
 public class User {
-	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private long id;
-	
-	@Column(nullable = false)
-	private String name;
-	
-	@Column(unique = true, nullable = false)
-	private String email;
-	
-	@Column(nullable = false) 
-	private String password;
-	
-	@ManyToMany(fetch = FetchType.EAGER)
-	@JoinTable(
-			name ="user_roles",
-			joinColumns = @JoinColumn(name="user_id"),
-			inverseJoinColumns = @JoinColumn(name="role_id")
-			)
-	private Set<Role> roles;
-	
-	@OneToMany(mappedBy = "farmer", cascade = CascadeType.ALL, orphanRemoval = true)
-	
-	private List<Product> products = new ArrayList<>();
-	
-	
-	
 
-	public long getId() {
-		return id;
-	}
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	public void setId(long id) {
-		this.id = id;
-	}
+    @Column(nullable = false)
+    private String name;
 
-	public String getName() {
-		return name;
-	}
+    @Column(unique = true, nullable = false)
+    private String email;
 
-	public void setName(String name) {
-		this.name = name;
-	}
+    @Column(nullable = false)
+    private String password;
 
-	public String getEmail() {
-		return email;
-	}
+    @ManyToMany(fetch = FetchType.EAGER)
+    @JoinTable(
+        name = "user_roles",
+        joinColumns = @JoinColumn(name = "user_id"),
+        inverseJoinColumns = @JoinColumn(name = "role_id")
+    )
+    private Set<Role> roles = new HashSet<>();
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+  
+    @OneToMany(mappedBy = "farmer", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Product> products = new ArrayList<>();
 
-	public String getPassword() {
-		return password;
-	}
+  
 
-	public void setPassword(String password) {
-		this.password = password;
-	}
+    public User() {}
 
-	public Set<Role> getRoles() {
-		return roles;
-	}
+    public User(String name, String email, String password, Set<Role> roles) {
+        this.name = name;
+        this.email = email;
+        this.password = password;
+        this.roles = roles;
+    }
 
-	public void setRoles(Set<Role> roles) {
-		this.roles = roles;
-	}
 
-	public List<Product> getProducts() {
-		return products;
-	}
 
-	public void setProducts(List<Product> products) {
-		this.products = products;
-	}
-	
-	
-	
-	
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public String getPassword() {
+        return password;
+    }
+
+    public void setPassword(String password) {
+        this.password = password;
+    }
+
+    public Set<Role> getRoles() {
+        return roles;
+    }
+
+    public void setRoles(Set<Role> roles) {
+        this.roles = roles;
+    }
+
+    public List<Product> getProducts() {
+        return products;
+    }
+
+    public void setProducts(List<Product> products) {
+        this.products = products;
+    }
+
+
+    /**
+     * Checks if the user has a given role name.
+     * Example: user.hasRole("ROLE_FARMER")
+     */
+    public boolean hasRole(String roleName) {
+        return roles.stream()
+                .anyMatch(role -> role.getName().equalsIgnoreCase(roleName));
+    }
+
+    /**
+     * Returns a list of all role names (e.g., [ROLE_FARMER, ROLE_ADMIN])
+     */
+    public List<String> getRoleNames() {
+        return roles.stream()
+                .map(Role::getName)
+                .toList();
+    }
+
+    @Override
+    public String toString() {
+        return "User{id=" + id +
+                ", email='" + email + '\'' +
+                ", roles=" + getRoleNames() +
+                '}';
+    }
 }
