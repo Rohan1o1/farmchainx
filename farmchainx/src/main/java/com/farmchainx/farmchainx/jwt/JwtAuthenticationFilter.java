@@ -33,6 +33,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
+        String path = request.getRequestURI();
+
+        // ✅ Step 1 — Skip public routes completely
+        if (isPublicPath(path)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
+        // ✅ Step 2 — Normal JWT validation for protected routes
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
@@ -46,21 +55,17 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String email = jwtUtil.extractUsername(token);
             String role = jwtUtil.extractRole(token);
 
-            System.out.println("✅ Role in JWT: " + role);
-
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            	List<SimpleGrantedAuthority> authorities =
-            	        List.of(new SimpleGrantedAuthority(role.trim().toUpperCase()));
+                List<SimpleGrantedAuthority> authorities =
+                        List.of(new SimpleGrantedAuthority(role.trim().toUpperCase()));
 
                 UsernamePasswordAuthenticationToken authenticationToken =
                         new UsernamePasswordAuthenticationToken(email, null, authorities);
 
-                // ✅ This is the missing piece!
                 authenticationToken.setDetails(
                         new WebAuthenticationDetailsSource().buildDetails(request)
                 );
 
-                // ✅ Tell Spring Security that the user is authenticated
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
             }
 
@@ -69,5 +74,14 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    // ✅ Helper method: define which URLs are public
+    private boolean isPublicPath(String path) {
+        return path.startsWith("/api/auth")
+                || path.startsWith("/api/verify")
+                || path.startsWith("/uploads")
+                || path.contains("/qrcode/download")
+                || (path.startsWith("/api/products") && "GET".equalsIgnoreCase(path));
     }
 }

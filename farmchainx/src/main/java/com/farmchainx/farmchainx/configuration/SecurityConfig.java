@@ -2,6 +2,7 @@ package com.farmchainx.farmchainx.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -15,7 +16,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.farmchainx.farmchainx.jwt.JwtAuthenticationFilter;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true) // enables @PreAuthorize and @RolesAllowed
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -37,42 +38,30 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
-        http
-            // Disable CSRF since we’re using stateless JWTs
-            .csrf(csrf -> csrf.disable())
-
-            // Authorize requests by path and role
+        http.csrf(csrf -> csrf.disable())
             .authorizeHttpRequests(auth -> auth
 
-                // 🔓 Public endpoints (no login required)
-                .requestMatchers("/api/auth/**").permitAll()        // register/login
-            
+                // ✅ Public routes
+                .requestMatchers("/api/auth/**").permitAll()
+                .requestMatchers("/api/verify/**").permitAll()
+                .requestMatchers("/uploads/**").permitAll()
+                .requestMatchers("/api/products/*/qrcode/download").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
 
-                // 🧑‍🌾 Product APIs — only Farmers can create/edit
-                .requestMatchers("/api/products/**")
-                    .hasAnyRole("FARMER")
+                // 🧑‍🌾 Farmers — upload + generate QR
+                .requestMatchers(HttpMethod.POST, "/api/products/upload").hasRole("FARMER")
+                .requestMatchers(HttpMethod.POST, "/api/products/*/qrcode").hasAnyRole("FARMER","ADMIN")
 
-                // 🔗 Supply Chain Tracking APIs
-                // Only Distributor/Retailer/Admin can update
-                .requestMatchers("/api/track/update")
-                    .hasAnyRole("DISTRIBUTOR","RETAILER","ADMIN")
+                // 🔗 Supply chain update
+                .requestMatchers("/api/track/update").hasAnyRole("DISTRIBUTOR","RETAILER","ADMIN")
 
-                // All users (even without login) can view product journeys
-                .requestMatchers("/api/track/**").permitAll()
-
-                // 🧑‍💼 Admin routes (overview, management)
+                // 🧑‍💼 Admin
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                // Anything else must be authenticated
+                // All others → must be logged in
                 .anyRequest().authenticated()
             )
-
-            // Stateless session: each request must include JWT
-            .sessionManagement(sess ->
-                sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-            )
-
-            // Add our JWT filter before UsernamePasswordAuthenticationFilter
+            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
