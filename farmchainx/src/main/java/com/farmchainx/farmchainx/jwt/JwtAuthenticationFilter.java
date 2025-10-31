@@ -34,17 +34,19 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     ) throws ServletException, IOException {
 
         String path = request.getRequestURI();
+        System.out.println("🧩 [JWT Filter] Running for path: " + path);
 
-        // ✅ Step 1 — Skip public routes completely
+        // ✅ Only skip login/register/uploads — NOT /verify
         if (isPublicPath(path)) {
+            System.out.println("⚪ [JWT Filter] Public path, skipping token check");
             filterChain.doFilter(request, response);
             return;
         }
 
-        // ✅ Step 2 — Normal JWT validation for protected routes
         final String authHeader = request.getHeader("Authorization");
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            System.out.println("⚪ [JWT Filter] No JWT token provided");
             filterChain.doFilter(request, response);
             return;
         }
@@ -54,6 +56,13 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         try {
             String email = jwtUtil.extractUsername(token);
             String role = jwtUtil.extractRole(token);
+
+            // Normalize role with ROLE_ prefix if missing
+            if (role != null && !role.toUpperCase().startsWith("ROLE_")) {
+                role = "ROLE_" + role.toUpperCase();
+            }
+
+            System.out.println("🟢 [JWT Filter] Token detected. User: " + email + " | Role: " + role);
 
             if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
                 List<SimpleGrantedAuthority> authorities =
@@ -67,21 +76,21 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
                 );
 
                 SecurityContextHolder.getContext().setAuthentication(authenticationToken);
+                System.out.println("✅ [JWT Filter] Authenticated user: " + email + " with role: " + role);
             }
 
         } catch (JwtException ex) {
-            logger.warn("Invalid JWT: " + ex.getMessage());
+            System.out.println("❌ [JWT Filter] Invalid JWT: " + ex.getMessage());
         }
 
         filterChain.doFilter(request, response);
     }
 
-    // ✅ Helper method: define which URLs are public
     private boolean isPublicPath(String path) {
         return path.startsWith("/api/auth")
-                || path.startsWith("/api/verify")
                 || path.startsWith("/uploads")
-                || path.contains("/qrcode/download")
-                || (path.startsWith("/api/products") && "GET".equalsIgnoreCase(path));
+                || path.startsWith("/api/verify")
+                || path.contains("/qrcode/download");
     }
+
 }

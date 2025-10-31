@@ -2,7 +2,6 @@ package com.farmchainx.farmchainx.configuration;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -39,29 +38,27 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http.csrf(csrf -> csrf.disable())
+            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
 
-                // ✅ Public routes
-                .requestMatchers("/api/auth/**").permitAll()
-                .requestMatchers("/api/verify/**").permitAll()
-                .requestMatchers("/uploads/**").permitAll()
-                .requestMatchers("/api/products/*/qrcode/download").permitAll()
-                .requestMatchers(HttpMethod.GET, "/api/products/**").permitAll()
+                // 🌍 Public routes — open for everyone
+                .requestMatchers(
+                        "/api/auth/**",
+                        "/uploads/**",
+                        "/api/verify/**",
+                        "/api/products/*/qrcode/download"  // ✅ FIXED: single wildcard
+                ).permitAll()
 
-                // 🧑‍🌾 Farmers — upload + generate QR
-                .requestMatchers(HttpMethod.POST, "/api/products/upload").hasRole("FARMER")
-                .requestMatchers(HttpMethod.POST, "/api/products/*/qrcode").hasAnyRole("FARMER","ADMIN")
-
-                // 🔗 Supply chain update
-                .requestMatchers("/api/track/update").hasAnyRole("DISTRIBUTOR","RETAILER","ADMIN")
-
-                // 🧑‍💼 Admin
+                // 🔐 Role-based restricted routes
+                .requestMatchers("/api/products/**")
+                    .hasAnyRole("FARMER", "DISTRIBUTOR", "RETAILER", "ADMIN")
+                .requestMatchers("/api/track/**")
+                    .hasAnyRole("DISTRIBUTOR", "RETAILER", "ADMIN")
                 .requestMatchers("/api/admin/**").hasRole("ADMIN")
 
-                // All others → must be logged in
+                // 🔒 Everything else requires authentication
                 .anyRequest().authenticated()
             )
-            .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

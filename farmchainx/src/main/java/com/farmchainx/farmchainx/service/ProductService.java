@@ -5,9 +5,11 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional; // ✅ use Spring’s version
 import com.farmchainx.farmchainx.model.Product;
@@ -82,34 +84,47 @@ public class ProductService {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product Not Found"));
 
-        String qrText = "https://farmchainx.com/products/" + product.getId();
+        // 🌍 Step 1: Use your machine’s local IP for now (so mobile on same Wi-Fi can access)
+        String baseUrl = getServerBaseUrl();
+        String qrText = baseUrl + "/api/verify/" + product.getId();
 
-        
+        // 📁 Step 2: Define QR code save location
         String qrPath = "uploads/qrcodes/product_" + productId + ".png";
 
         try {
-            
             File qrFile = new File(qrPath);
             File parentDir = qrFile.getParentFile();
             if (parentDir != null && !parentDir.exists()) {
-                boolean created = parentDir.mkdirs();
-                if (!created) {
+                if (!parentDir.mkdirs()) {
                     throw new RuntimeException("Failed to create directory: " + parentDir.getAbsolutePath());
                 }
             }
 
-            
+            // 🧩 Step 3: Generate QR
             QrCodeGenerator.generateQR(qrText, qrPath);
 
-           
+            // 🗂️ Step 4: Save path in DB
             product.setQrCodePath(qrPath);
             productRepository.save(product);
 
+            System.out.println("✅ [QR Generated] " + qrText);
             return qrPath;
-        } catch (WriterException | IOException e) {
+
+        } catch (Exception e) {
             throw new RuntimeException("Error generating QR: " + e.getMessage());
         }
     }
+
+   
+    private String getServerBaseUrl() {
+        try {
+            String localIp = java.net.InetAddress.getLocalHost().getHostAddress();
+            return "http://" + localIp + ":8081"; // ✅ Works on LAN (Wi-Fi)
+        } catch (Exception e) {
+            return "http://localhost:8081"; // fallback
+        }
+    }
+
     
     public byte[] getProductQRImage(Long productId) {
     	Product product = productRepository.findById(productId)
@@ -129,6 +144,50 @@ public class ProductService {
     	}
     	
     }
+    
+    public Map<String, Object> getPublicView(Long productId){
+    	Product product = productRepository.findById(productId)
+    			.orElseThrow(()->new RuntimeException("Product Not found"));
+    	
+    	Map<String, Object> data = new HashMap<>();
+    	
+    	data.put("cropName", product.getCropName());
+    	data.put("harvestDate", product.getHarvestDate());
+          data.put("qualityGrade", product.getQualityGrade());
+          data.put("confidence", product.getConfidenceScore());
+          data.put("imageUrl", product.getImagePath());
+          return data;
+
+    }
+    
+    public Map<String, Object> getAuthorizedView(Long productId, Object userPrincipal) {
+        Product product = productRepository.findById(productId)
+                .orElseThrow(() -> new RuntimeException("Product not found"));
+
+        Map<String, Object> data = new HashMap<>(getPublicView(productId));
+        data.put("soilType", product.getSoilType());
+        data.put("pesticides", product.getPesticides());
+        data.put("gpsLocation", product.getGpsLocation());
+
+        String requestedBy = "Unknown";
+
+        try {
+            if (userPrincipal != null) {
+                if (userPrincipal instanceof UserDetails userDetails) {
+                    requestedBy = userDetails.getUsername();
+                } else if (userPrincipal instanceof String strUser) {
+                    requestedBy = strUser;
+                }
+            }
+        } catch (Exception e) {
+            System.out.println("⚠️ [AuthorizedView] Unable to resolve user: " + e.getMessage());
+        }
+
+        data.put("requestedBy", requestedBy);
+        data.put("canUpdateChain", true);
+        return data;
+    }
+
 
     
     
