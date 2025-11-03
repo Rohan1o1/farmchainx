@@ -24,6 +24,7 @@ public class VerificationController {
 
         System.out.println("🟢 [VERIFY] API called for Product ID: " + productId);
 
+        // 🧩 Case 1: Not logged in → Public View
         if (principal == null) {
             System.out.println("🔵 [VERIFY] User not logged in → Returning Public View");
             return ResponseEntity.ok(productService.getPublicView(productId));
@@ -40,17 +41,19 @@ public class VerificationController {
                 .anyMatch(auth -> {
                     String role = auth.getAuthority();
                     System.out.println("   🔍 Checking role: " + role);
-                    return role.equals("ROLE_DISTRIBUTER")
-                            || role.equals("ROLE_RETAILER")
-                            || role.equals("ROLE_ADMIN");
+                    return role.equalsIgnoreCase("ROLE_DISTRIBUTER")
+                            || role.equalsIgnoreCase("ROLE_RETAILER")
+                            || role.equalsIgnoreCase("ROLE_ADMIN");
                 });
 
+        // 🧩 Case 2: Authorized Roles → Authorized View
         if (isAuthorized) {
             System.out.println("✅ [VERIFY] Authorized role detected → Returning Authorized View");
-            return ResponseEntity.ok(productService.getAuthorizedView(productId, null));
+            return ResponseEntity.ok(productService.getAuthorizedView(productId, principal.getName()));
         }
 
-        System.out.println("⚪ [VERIFY] User logged in but not authorized → Returning Public View");
+        // 🧩 Case 3: Logged in but not authorized (Farmer / Consumer) → Public View
+        System.out.println("⚪ [VERIFY] Logged in but not authorized → Returning Public View");
         return ResponseEntity.ok(productService.getPublicView(productId));
     }
 }

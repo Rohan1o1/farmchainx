@@ -36,7 +36,8 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         System.out.println("🧩 [JWT Filter] Running for path: " + path);
 
-        // ✅ Only skip login/register/uploads — NOT /verify
+        // ✅ Only skip true public paths (login, uploads, QR download)
+        // ⚠️ DO NOT skip /api/verify — we want to parse token if available
         if (isPublicPath(path)) {
             System.out.println("⚪ [JWT Filter] Public path, skipping token check");
             filterChain.doFilter(request, response);
@@ -86,11 +87,10 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
+    // ✅ FINAL: /api/verify removed from here
     private boolean isPublicPath(String path) {
         return path.startsWith("/api/auth")
                 || path.startsWith("/uploads")
-                || path.startsWith("/api/verify")
                 || path.contains("/qrcode/download");
     }
-
 }

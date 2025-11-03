@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.security.Principal;
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
@@ -80,6 +81,7 @@ public class ProductController {
         return saved;
     }
 
+    // 👨‍🌾 FARMER or 👮‍♂️ ADMIN can generate QR
     @PreAuthorize("hasAnyRole('FARMER','ADMIN')")
     @PostMapping("/{id}/qrcode")
     public String generateProductQrCode(@PathVariable Long id, Principal principal) {
@@ -96,19 +98,16 @@ public class ProductController {
                 .anyMatch(role -> role.getName().equalsIgnoreCase("ROLE_ADMIN"));
 
         // 👨‍🌾 FARMER: can only generate QR for their own products
-        if (isFarmer && product.getFarmer().getId() != currentUser.getId()) {
+        if (isFarmer && !product.getFarmer().getId().equals(currentUser.getId())) {
             throw new RuntimeException("Access Denied: You can only generate QR for your own products");
         }
 
-        // 🧑‍💼 ADMIN: can generate QR for any product
         if (isAdmin || isFarmer) {
             return productService.generateProductQr(id);
         }
 
         throw new RuntimeException("Access Denied: Unauthorized role");
     }
-
-
 
     // 🌍 Public — anyone can download product QR
     @GetMapping("/{id}/qrcode/download")
@@ -118,5 +117,38 @@ public class ProductController {
                 .header("Content-Type", "image/png")
                 .header("Content-Disposition", "attachment; filename=product_" + id + ".png")
                 .body(imageBytes);
+    }
+
+    // 👨‍🌾 Get all products of logged-in Farmer
+    @PreAuthorize("hasRole('FARMER')")
+    @GetMapping("/my")
+    public List<Product> getMyProducts(Principal principal) {
+        String email = principal.getName();
+        User farmer = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("Farmer not found"));
+        return productService.getProductsByFarmerId(farmer.getId());
+    }
+
+    // 🧠 Filter products by crop name and date (for admin or marketplace view)
+    @PreAuthorize("hasAnyRole('ADMIN','RETAILER','DISTRIBUTOR')")
+    @GetMapping("/filter")
+    public List<Product> filterProducts(
+            @RequestParam(required = false) String cropName,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate endDate
+    ) {
+        return productService.filterProducts(cropName, endDate);
+    }
+
+    // 🌿 Public view for QR verification
+    @GetMapping("/{id}/public")
+    public Map<String, Object> getPublicView(@PathVariable Long id) {
+        return productService.getPublicView(id);
+    }
+
+    // 🔒 Authorized detailed view for logged-in users
+    @PreAuthorize("hasAnyRole('FARMER','ADMIN','DISTRIBUTOR','RETAILER')")
+    @GetMapping("/{id}/details")
+    public Map<String, Object> getAuthorizedView(@PathVariable Long id, Principal principal) {
+        return productService.getAuthorizedView(id, principal != null ? principal.getName() : null);
     }
 }
