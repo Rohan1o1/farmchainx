@@ -1,6 +1,8 @@
 package com.farmchainx.farmchainx.repository;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+
 import com.farmchainx.farmchainx.model.SupplyChainLog;
 import java.util.List;
 import java.util.Optional;
@@ -12,4 +14,17 @@ public interface SupplyChainLogRepository extends JpaRepository<SupplyChainLog, 
 
 
     Optional<SupplyChainLog> findTopByProductIdOrderByTimestampDesc(Long productId);
+    
+    @Query("""
+    	    SELECT log 
+    	    FROM SupplyChainLog log 
+    	    WHERE log.toUserId = :retailerId 
+    	      AND log.id = (
+    	            SELECT MAX(l2.id) 
+    	            FROM SupplyChainLog l2 
+    	            WHERE l2.productId = log.productId
+    	        )
+    	""")
+    	List<SupplyChainLog> findPendingForRetailer(Long retailerId);
+
 }

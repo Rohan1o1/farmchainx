@@ -38,40 +38,36 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
 
         http
-            // 🔒 Disable CSRF since we use JWT (stateless)
             .csrf(csrf -> csrf.disable())
-
-            // 🔒 Stateless session (JWT-based)
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-            // ⚙️ Authorization rules
             .authorizeHttpRequests(auth -> auth
 
-                // 🌍 Public routes — open to everyone (no login required)
+                // ✅ feedback route MUST come before /api/products/**
+                .requestMatchers("/api/products/*/feedback").permitAll()
+
+                // ✅ Public routes
                 .requestMatchers(
-                        "/api/auth/**",                   // login/register
-                        "/uploads/**",                     // images, static files
-                        "/api/verify/**",                  // QR scan verification (public + token-supported)
-                        "/api/products/*/qrcode/download"  // QR image download
+                        "/api/auth/**",
+                        "/uploads/**",
+                        "/api/verify/**",
+                        "/api/products/*/qrcode/download"
                 ).permitAll()
 
-                // 👨‍🌾 Product endpoints — FARMER + supply chain roles
+                // ✅ Product routes need farmer / supply chain roles
                 .requestMatchers("/api/products/**")
-                    .hasAnyRole("FARMER", "DISTRIBUTER", "RETAILER", "ADMIN")
+                        .hasAnyRole("FARMER", "DISTRIBUTER", "RETAILER", "ADMIN")
 
-                // 🚚 Tracking endpoints — only DISTRIBUTER, RETAILER, ADMIN
+                // ✅ Tracking routes
                 .requestMatchers("/api/track/**")
-                    .hasAnyRole("DISTRIBUTER", "RETAILER", "ADMIN")
+                        .hasAnyRole("DISTRIBUTER", "RETAILER", "ADMIN")
 
-                // 🧑‍💼 Admin-only endpoints
+                // ✅ Admin routes
                 .requestMatchers("/api/admin/**")
-                    .hasRole("ADMIN")
+                        .hasRole("ADMIN")
 
-                // 🔐 Everything else → must be authenticated
+                // ✅ Everything else needs authentication
                 .anyRequest().authenticated()
             )
-
-            // 🧩 Add JWT filter before username-password auth filter
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
