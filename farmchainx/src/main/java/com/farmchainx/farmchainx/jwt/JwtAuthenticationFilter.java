@@ -33,11 +33,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
+        // ✅ Skip browser preflight requests
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         String path = request.getRequestURI();
         System.out.println("🧩 [JWT Filter] Running for path: " + path);
 
-        // ✅ Only skip true public paths (login, uploads, QR download)
-        // ⚠️ DO NOT skip /api/verify — we want to parse token if available
         if (isPublicPath(path)) {
             System.out.println("⚪ [JWT Filter] Public path, skipping token check");
             filterChain.doFilter(request, response);
@@ -58,7 +62,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             String email = jwtUtil.extractUsername(token);
             String role = jwtUtil.extractRole(token);
 
-            // Normalize role with ROLE_ prefix if missing
             if (role != null && !role.toUpperCase().startsWith("ROLE_")) {
                 role = "ROLE_" + role.toUpperCase();
             }
@@ -87,7 +90,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         filterChain.doFilter(request, response);
     }
 
-    // ✅ FINAL: /api/verify removed from here
     private boolean isPublicPath(String path) {
         return path.startsWith("/api/auth")
                 || path.startsWith("/uploads")

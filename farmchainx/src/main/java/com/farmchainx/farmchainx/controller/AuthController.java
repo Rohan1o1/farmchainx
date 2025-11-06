@@ -22,10 +22,10 @@ public class AuthController {
 	}
 	
 	@PostMapping("/register")
-	public ResponseEntity<String> register(@RequestBody RegisterRequest register){
-		return ResponseEntity.ok(authService.register(register));
-		
+	public ResponseEntity<AuthResponse> register(@RequestBody RegisterRequest register){
+	    return ResponseEntity.ok(authService.register(register));
 	}
+
 	
 	@PostMapping("/login")
 	public ResponseEntity<AuthResponse> login(@RequestBody LoginRequest login){

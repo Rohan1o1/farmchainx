@@ -34,54 +34,46 @@ public class AuthService {
         this.jwtUtil = jwtUtil;
     }
 
-    public String register(RegisterRequest request) {
-        try {
-            if (userRepository.findByEmail(request.getEmail()).isPresent()) {
-                return "⚠️ Email already exists!";
-            }
+    public AuthResponse register(RegisterRequest request) {
 
-            String roleInput = request.getRole().toUpperCase();
-
-            // prevent direct admin sign-up
-            if (roleInput.equals("ADMIN") || roleInput.equals("ROLE_ADMIN")) {
-                return "🚫 Cannot register as Admin!";
-            }
-
-            String chosenRole = roleInput.startsWith("ROLE_") ? roleInput : "ROLE_" + roleInput;
-
-            // ✅ changed from findByRoleName → findByName
-            Role userRole = roleRepository.findByName(chosenRole)
-                    .orElseThrow(() -> new RuntimeException("Role not found: " + chosenRole));
-
-            User user = new User();
-            user.setName(request.getName());
-            user.setEmail(request.getEmail());
-            user.setPassword(passwordEncoder.encode(request.getPassword()));
-            user.setRoles(Set.of(userRole));
-
-            userRepository.save(user);
-
-            return "✅ User registered successfully as " + chosenRole + "!";
-
-        } catch (RuntimeException e) {
-            e.printStackTrace();
-            return "❌ Registration failed: " + e.getMessage();
+        if (userRepository.existsByEmail(request.getEmail())) {
+            throw new RuntimeException("Email already exists!");
         }
+
+        Role role = roleRepository.findByName("ROLE_CONSUMER")
+                .orElseThrow(() -> new RuntimeException("Consumer role missing"));
+
+        User user = new User();
+        user.setName(request.getName());
+        user.setEmail(request.getEmail());
+        user.setPassword(passwordEncoder.encode(request.getPassword()));
+        user.setRoles(Set.of(role));
+
+        userRepository.save(user);
+
+        return new AuthResponse(null, "ROLE_CONSUMER", request.getEmail());
     }
 
+
     public AuthResponse login(LoginRequest login) {
+
         User user = userRepository.findByEmail(login.getEmail())
                 .orElseThrow(() -> new RuntimeException("User not found"));
 
         if (!passwordEncoder.matches(login.getPassword(), user.getPassword())) {
-            throw new RuntimeException("Invalid password");
+            throw new RuntimeException("Invalid password!");
         }
 
-        // ✅ changed from getRoleName → getName
-        String role = user.getRoles().iterator().next().getName();
+        // ✅ Get first role (Because Set<Role>)
+        String role = user.getRoles()
+                .stream()
+                .map(Role::getName)
+                .findFirst()
+                .orElse("ROLE_CONSUMER");
 
-        String token = jwtUtil.generateToken(user.getEmail(), role, user.getId());
+        String token = jwtUtil.generateToken(login.getEmail(), role, user.getId());
 
-        return new AuthResponse(token, role, user.getEmail());
+        return new AuthResponse(token, role, login.getEmail());
     }
+
 }

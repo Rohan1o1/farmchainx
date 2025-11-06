@@ -1,39 +1,57 @@
 package com.farmchainx.farmchainx.configuration;
 
+import java.util.Set;
+
 import org.springframework.boot.CommandLineRunner;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Component;
 import com.farmchainx.farmchainx.model.Role;
+import com.farmchainx.farmchainx.model.User;
 import com.farmchainx.farmchainx.repository.RoleRepository;
+import com.farmchainx.farmchainx.repository.UserRepository;
 
-@Component
-public class DataSeeder implements CommandLineRunner {
 
-    private final RoleRepository roleRepository;
+    @Component
+    public class DataSeeder implements CommandLineRunner {
 
-    public DataSeeder(RoleRepository roleRepository) {
-        this.roleRepository = roleRepository;
-    }
+        private final RoleRepository roleRepo;
+        private final UserRepository userRepo;
+        private final PasswordEncoder encoder;
 
-    @Override
-    public void run(String... args) throws Exception {
-
-        String[] roles = {
-            "ROLE_CONSUMER",
-            "ROLE_FARMER",
-            "ROLE_DISTRIBUTER",
-            "ROLE_RETAILER",
-            "ROLE_ADMIN"
-        };
-
-        for (String roleName : roles) {
-            // ✅ use the correct repository method and field name
-            if (!roleRepository.existsByName(roleName)) {
-                Role role = new Role();
-                role.setName(roleName); // ✅ correct setter for Role.name
-                roleRepository.save(role);
-            }
+        public DataSeeder(RoleRepository roleRepo, UserRepository userRepo, PasswordEncoder encoder) {
+            this.roleRepo = roleRepo;
+            this.userRepo = userRepo;
+            this.encoder = encoder;
         }
 
-        System.out.println("✅ Role seeding completed successfully!");
+        @Override
+        public void run(String... args) {
+
+            // ✅ 1) Create all roles
+            String[] roles = {"ROLE_CONSUMER","ROLE_FARMER","ROLE_DISTRIBUTER","ROLE_RETAILER","ROLE_ADMIN"};
+            for (String r : roles) {
+                if (!roleRepo.existsByName(r)) {
+                    Role role = new Role();
+                    role.setName(r);
+                    roleRepo.save(role);
+                }
+            }
+
+            // ✅ 2) Create default admin
+            String email = "admin@farmchainx.com";
+
+            if (!userRepo.existsByEmail(email)) {
+                Role adminRole = roleRepo.findByName("ROLE_ADMIN").orElseThrow();
+
+                User admin = new User();
+                admin.setName("Admin");
+                admin.setEmail(email);
+                admin.setPassword(encoder.encode("admin123"));
+                admin.setRoles(Set.of(adminRole));
+
+                userRepo.save(admin);
+
+                System.out.println("✅ Default admin created: " + email + " | password: admin123");
+            }
+        }
     }
-}
