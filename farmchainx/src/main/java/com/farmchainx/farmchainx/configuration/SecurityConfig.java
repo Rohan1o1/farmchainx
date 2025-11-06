@@ -39,37 +39,47 @@ public class SecurityConfig {
 
         http
             .csrf(csrf -> csrf.disable())
+
+            // ✅ Allow controller exceptions to reach client instead of being converted to 403
+            .exceptionHandling(ex -> ex.authenticationEntryPoint((req, res, e) -> {}))
+
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .authorizeHttpRequests(auth -> auth
 
-                // ✅ feedback route MUST come before /api/products/**
-                .requestMatchers("/api/products/*/feedback").permitAll()
+                    // ✅ MUST BE FIRST to avoid 403 on register/login
+                    .requestMatchers("/api/auth/**").permitAll()
 
-                // ✅ Public routes
-                .requestMatchers(
-                        "/api/auth/**",
-                        "/uploads/**",
-                        "/api/verify/**",
-                        "/api/products/*/qrcode/download"
-                ).permitAll()
+                    // ✅ Allow Spring Boot default error page (prevents AuthorizationDeniedException logs)
+                    .requestMatchers("/error").permitAll()
 
-                // ✅ Product routes need farmer / supply chain roles
-                .requestMatchers("/api/products/**")
-                        .hasAnyRole("FARMER", "DISTRIBUTER", "RETAILER", "ADMIN")
+                    .requestMatchers("/api/products/*/feedback").permitAll()
+                    .requestMatchers(
+                            "/uploads/**",
+                            "/api/verify/**",
+                            "/api/products/*/qrcode/download"
+                    ).permitAll()
 
-                // ✅ Tracking routes
-                .requestMatchers("/api/track/**")
-                        .hasAnyRole("DISTRIBUTER", "RETAILER", "ADMIN")
+                    // ✅ Public product viewing
+                    .requestMatchers("/api/products", "/api/products/*").permitAll()
 
-                // ✅ Admin routes
-                .requestMatchers("/api/admin/**")
-                        .hasRole("ADMIN")
+                    // ✅ Product modification for roles
+                    .requestMatchers("/api/products/**")
+                            .hasAnyRole("FARMER", "DISTRIBUTER", "RETAILER", "ADMIN")
 
-                // ✅ Everything else needs authentication
-                .anyRequest().authenticated()
+                    // ✅ Tracking
+                    .requestMatchers("/api/track/**")
+                            .hasAnyRole("DISTRIBUTER", "RETAILER", "ADMIN")
+
+                    // ✅ Admin only
+                    .requestMatchers("/api/admin/**")
+                            .hasRole("ADMIN")
+
+                    // ✅ Everything else requires authentication
+                    .anyRequest().authenticated()
             )
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
+
 }

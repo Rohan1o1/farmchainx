@@ -33,7 +33,6 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
             @NonNull FilterChain filterChain
     ) throws ServletException, IOException {
 
-        // ✅ Skip browser preflight requests
         if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
             filterChain.doFilter(request, response);
             return;
@@ -42,6 +41,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
         String path = request.getRequestURI();
         System.out.println("🧩 [JWT Filter] Running for path: " + path);
 
+        // ✅ Allow public paths to continue to the controller
         if (isPublicPath(path)) {
             System.out.println("⚪ [JWT Filter] Public path, skipping token check");
             filterChain.doFilter(request, response);
@@ -50,6 +50,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         final String authHeader = request.getHeader("Authorization");
 
+        // ✅ Allow requests without token to continue
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             System.out.println("⚪ [JWT Filter] No JWT token provided");
             filterChain.doFilter(request, response);
@@ -85,6 +86,7 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
         } catch (JwtException ex) {
             System.out.println("❌ [JWT Filter] Invalid JWT: " + ex.getMessage());
+            // We still pass forward so that controller returns proper error
         }
 
         filterChain.doFilter(request, response);

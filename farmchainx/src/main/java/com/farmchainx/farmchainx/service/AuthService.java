@@ -1,7 +1,9 @@
 package com.farmchainx.farmchainx.service;
 
+import org.springframework.http.HttpStatus;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import com.farmchainx.farmchainx.dto.AuthResponse;
 import com.farmchainx.farmchainx.dto.LoginRequest;
@@ -37,22 +39,29 @@ public class AuthService {
     public AuthResponse register(RegisterRequest request) {
 
         if (userRepository.existsByEmail(request.getEmail())) {
-            throw new RuntimeException("Email already exists!");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists!");
         }
 
-        Role role = roleRepository.findByName("ROLE_CONSUMER")
-                .orElseThrow(() -> new RuntimeException("Consumer role missing"));
+        // ✅ Only allow 4 roles during register
+        if (!Set.of("CONSUMER", "FARMER", "DISTRIBUTER", "RETAILER")
+                .contains(request.getRole().toUpperCase())) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot register as ADMIN!");
+        }
+
+        Role role = roleRepository.findByName("ROLE_" + request.getRole().toUpperCase())
+                .orElseThrow(() -> new RuntimeException("Role not found"));
 
         User user = new User();
         user.setName(request.getName());
         user.setEmail(request.getEmail());
         user.setPassword(passwordEncoder.encode(request.getPassword()));
         user.setRoles(Set.of(role));
-
         userRepository.save(user);
 
-        return new AuthResponse(null, "ROLE_CONSUMER", request.getEmail());
+        return new AuthResponse(null, role.getName(), request.getEmail());
     }
+
+
 
 
     public AuthResponse login(LoginRequest login) {
@@ -64,16 +73,18 @@ public class AuthService {
             throw new RuntimeException("Invalid password!");
         }
 
-        // ✅ Get first role (Because Set<Role>)
         String role = user.getRoles()
                 .stream()
                 .map(Role::getName)
                 .findFirst()
                 .orElse("ROLE_CONSUMER");
 
+        // ✅ If user has ROLE_ADMIN because he was approved → he can login
         String token = jwtUtil.generateToken(login.getEmail(), role, user.getId());
 
         return new AuthResponse(token, role, login.getEmail());
     }
+
+
 
 }
