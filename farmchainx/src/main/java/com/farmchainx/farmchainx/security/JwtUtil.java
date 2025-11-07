@@ -18,11 +18,10 @@ public class JwtUtil {
         return Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
     }
 
-    // ✅ Generate token with email, role, and userId
     public String generateToken(String email, String role, Long userId) {
         return Jwts.builder()
                 .setSubject(email)
-                .claim("role", role)
+                .claim("role", role)   // ✅ role stored in token
                 .claim("userId", userId)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + EXPIRATION))
@@ -30,7 +29,6 @@ public class JwtUtil {
                 .compact();
     }
 
-    // Extract email (subject)
     public String extractUsername(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -40,7 +38,6 @@ public class JwtUtil {
                 .getSubject();
     }
 
-    // Extract role
     public String extractRole(String token) {
         return (String) Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -50,7 +47,6 @@ public class JwtUtil {
                 .get("role");
     }
 
-    // Extract userId
     public Long extractUserId(String token) {
         return ((Number) Jwts.parserBuilder()
                 .setSigningKey(getSigningKey())
@@ -60,10 +56,9 @@ public class JwtUtil {
                 .get("userId")).longValue();
     }
 
-    // Validate token
     public boolean validateToken(String token, String email) {
         String extractedEmail = extractUsername(token);
-        return (extractedEmail.equals(email) && !isExpired(token));
+        return extractedEmail.equals(email) && !isExpired(token);
     }
 
     private boolean isExpired(String token) {

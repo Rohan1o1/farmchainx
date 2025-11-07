@@ -69,10 +69,13 @@ public class SecurityConfig {
                     // ✅ Tracking
                     .requestMatchers("/api/track/**")
                             .hasAnyRole("DISTRIBUTER", "RETAILER", "ADMIN")
+                            .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
 
                     // ✅ Admin only
                     .requestMatchers("/api/admin/**")
                             .hasRole("ADMIN")
+                            
+                     
 
                     // ✅ Everything else requires authentication
                     .anyRequest().authenticated()
