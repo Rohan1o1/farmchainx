@@ -42,13 +42,16 @@ public class AuthService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Email already exists!");
         }
 
+        String roleInput = request.getRole().trim().toUpperCase();
+
         if (!Set.of("CONSUMER", "FARMER", "DISTRIBUTER", "RETAILER")
-                .contains(request.getRole().toUpperCase())) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "You cannot register as ADMIN!");
+                .contains(roleInput)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Only Consumer, Farmer, Distributer, Retailer allowed");
         }
 
-        Role role = roleRepository.findByName("ROLE_" + request.getRole().toUpperCase())
-                .orElseThrow(() -> new RuntimeException("Role not found"));
+        Role role = roleRepository.findByName("ROLE_" + roleInput)
+                .orElseThrow(() -> new RuntimeException("Role not found in DB"));
 
         User user = new User();
         user.setName(request.getName());
