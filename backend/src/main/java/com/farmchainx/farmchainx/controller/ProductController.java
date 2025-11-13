@@ -29,6 +29,8 @@ public class ProductController {
         this.productService = productService;
         this.userRepository = userRepository;
     }
+    
+ 
 
     // 🧑‍🌾 Only Farmers can upload products
     @PreAuthorize("hasRole('FARMER')")

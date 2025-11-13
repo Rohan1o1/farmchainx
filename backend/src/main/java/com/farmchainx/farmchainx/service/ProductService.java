@@ -8,6 +8,7 @@ import java.time.LocalDate;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -73,9 +74,9 @@ public class ProductService {
         return productRepository.findByFarmerId(farmerId);
     }
 
-    public Product getProductById(Long productId) {
-        return productRepository.findById(productId)
-                .orElseThrow(() -> new RuntimeException("Product not found"));
+    public Product getProductById(Long id) {
+        return productRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Product not found"));
     }
 
     public List<Product> filterProducts(String cropName, LocalDate endDate) {
@@ -188,4 +189,8 @@ public class ProductService {
         data.put("requestedBy", requestedBy);
         return data;
     }
+  
+
+   
+
 }

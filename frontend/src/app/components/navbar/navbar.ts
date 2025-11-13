@@ -6,6 +6,6 @@ import { RouterLink, RouterLinkActive } from '@angular/router';
   standalone: true,
   imports: [RouterLink, RouterLinkActive],
   templateUrl: './navbar.html',
-  styleUrls: ['./navbar.scss']
+  styleUrl: './navbar.scss'
 })
-export class Navbar {}    // keep short class name if you like
+export class Navbar {}
