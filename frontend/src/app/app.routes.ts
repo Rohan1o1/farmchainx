@@ -1,12 +1,13 @@
-
 import { Routes } from '@angular/router';
-import { Home } from './pages/home/home';
-import { Login } from './pages/login/login';
-import { Register } from './pages/register/register';
 
 export const routes: Routes = [
-  { path: '',          component: Home },
-  { path: 'login',     component: Login },
-  { path: 'register',  component: Register },
-  { path: '**',        redirectTo: '' }
+  { path: '', loadComponent: () => import('./pages/home/home').then(m => m.Home) },
+
+  { path: 'login', loadComponent: () => import('./pages/login/login').then(m => m.Login) },
+
+  { path: 'register', loadComponent: () => import('./pages/register/register').then(m => m.Register) },
+
+  { path: 'dashboard', loadComponent: () => import('./pages/dashboard/dashboard').then(m => m.Dashboard) },
+
+  { path: '**', redirectTo: '' }
 ];

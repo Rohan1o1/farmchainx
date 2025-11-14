@@ -1,2 +1,57 @@
-<h2>Register Page</h2>
-<p>Register form will come later.</p>
+<div class="max-w-md mx-auto mt-10 p-6 bg-white shadow rounded-xl">
+  <h2 class="text-2xl font-bold mb-4">Create Account 🌱</h2>
+
+  <form (ngSubmit)="submit()" #f="ngForm" autocomplete="off">
+    <input
+      class="w-full border rounded px-3 py-2 mb-3"
+      name="name"
+      placeholder="Full name"
+      [(ngModel)]="name"
+      required
+    />
+
+    <input
+      class="w-full border rounded px-3 py-2 mb-3"
+      name="email"
+      type="email"
+      placeholder="Email"
+      [(ngModel)]="email"
+      required
+    />
+
+    <input
+      class="w-full border rounded px-3 py-2 mb-3"
+      name="password"
+      type="password"
+      placeholder="Password (min 4 chars)"
+      [(ngModel)]="password"
+      minlength="4"
+      required
+    />
+
+    <select
+      class="w-full border rounded px-3 py-2 mb-3"
+      name="role"
+      [(ngModel)]="role"
+      required
+    >
+      <option value="">Select role</option>
+      <option value="FARMER">Farmer</option>
+      <option value="CONSUMER">Consumer</option>
+      <option value="DISTRIBUTER">Distributor</option>
+      <option value="RETAILER">Retailer</option>
+    </select>
+
+    <button
+      type="submit"
+      class="w-full bg-green-600 text-white rounded px-4 py-2 hover:bg-green-700"
+    >
+      Register
+    </button>
+  </form>
+
+  <p class="text-sm text-gray-600 mt-4">
+    Already have an account?
+    <a routerLink="/login" class="text-blue-600 font-semibold">Login</a>
+  </p>
+</div>
