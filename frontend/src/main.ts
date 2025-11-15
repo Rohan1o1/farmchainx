@@ -2,11 +2,17 @@
 import { bootstrapApplication } from '@angular/platform-browser';
 import { App } from './app/app';
 import { appConfig } from './app/app.config';
-import { provideHttpClient } from '@angular/common/http';
+
+import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { JwtInterceptor } from './app/interceptors/jwt.interceptor';
 
 bootstrapApplication(App, {
   providers: [
     ...appConfig.providers,
-    provideHttpClient()               // required for AuthService
+
+    // Http client + JWT interceptor
+    provideHttpClient(
+      withInterceptors([JwtInterceptor])
+    )
   ]
 }).catch(err => console.error(err));
