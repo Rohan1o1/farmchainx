@@ -1,11 +1,18 @@
-import { Component } from '@angular/core';
-import { RouterModule } from '@angular/router';  
+
+import { Component, inject } from '@angular/core';
 
 @Component({
   selector: 'app-home',
   standalone: true,
-  imports: [RouterModule],  
-  templateUrl: './home.html',
-  styleUrls: ['./home.scss'],
+  templateUrl: './home.html'
 })
-export class Home {}
+export class Home {
+
+  get isLoggedIn(): boolean {
+    return !!localStorage.getItem('fcx_token');
+  }
+
+  get isFarmer(): boolean {
+    return localStorage.getItem('fcx_role') === 'ROLE_FARMER';
+  }
+}

@@ -1,0 +1,22 @@
+<div style="max-width:900px;margin:20px auto;padding:12px;">
+  <h1 style="font-size:28px;margin-bottom:12px;">My Products</h1>
+
+  <div *ngIf="loading">Loading…</div>
+  <div *ngIf="error" style="color:crimson">{{ error }}</div>
+
+  <div *ngIf="!loading && products.length === 0">
+    <p>You have no products yet.</p>
+    <button (click)="openUpload()" style="padding:8px 10px;background:#4caf50;color:white;border-radius:4px;">Upload Product</button>
+  </div>
+
+  <ul *ngIf="!loading && products.length > 0">
+    <li *ngFor="let p of products" style="margin-bottom:12px;border:1px solid #eee;padding:8px;border-radius:6px;">
+      <div><strong>{{ p.cropName }}</strong> — {{ p.harvestDate }}</div>
+      <div style="font-size:13px;color:#666">Quality: {{ p.qualityGrade }} ({{ p.confidenceScore }})</div>
+      <div style="margin-top:6px;">
+        <button (click)="generateQr(p.id)" style="padding:6px 8px;margin-right:6px;">Generate QR</button>
+        <a [href]="'/api/products/' + p.id + '/qrcode/download'">Download QR</a>
+      </div>
+    </li>
+  </ul>
+</div>

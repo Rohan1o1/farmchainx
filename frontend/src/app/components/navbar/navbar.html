@@ -1,5 +1,41 @@
-<nav>
-  <a routerLink="/" routerLinkActive="active">Home</a> |
-  <a routerLink="/login" routerLinkActive="active">Login</a> |
-  <a routerLink="/register" routerLinkActive="active">Register</a>
+<nav style="
+  border-bottom:1px solid #ddd;
+  padding:10px 12px;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+">
+
+  <!-- LEFT SIDE: ONLY Home -->
+  <div style="display:flex;align-items:center;gap:12px;">
+    <a routerLink="/" routerLinkActive="active" style="font-size:18px;font-weight:600;">
+      Home
+    </a>
+  </div>
+
+  <!-- RIGHT SIDE -->
+  <div style="display:flex;align-items:center;gap:12px;">
+
+    <!-- Guest -->
+    <ng-container *ngIf="!isLoggedIn">
+      <a routerLink="/login" routerLinkActive="active">Login</a>
+      <a routerLink="/register" routerLinkActive="active">Register</a>
+    </ng-container>
+
+    <!-- Farmer -->
+    <ng-container *ngIf="isLoggedIn && isFarmer">
+      <a routerLink="/upload" routerLinkActive="active">Upload Product</a>
+      <a routerLink="/products/my" routerLinkActive="active">My Products</a>
+    </ng-container>
+
+    <!-- Logged-in -->
+    <ng-container *ngIf="isLoggedIn">
+      <span style="margin-left:6px;color:#333;">{{ userName }}</span>
+
+      <button (click)="logout()" style="padding:6px 10px;border:1px solid #ccc;">
+        Logout
+      </button>
+    </ng-container>
+
+  </div>
 </nav>

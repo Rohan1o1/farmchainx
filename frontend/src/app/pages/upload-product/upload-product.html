@@ -1,0 +1,43 @@
+<div style="max-width:600px;margin:20px auto;padding:10px;">
+
+  <h2 style="font-size:24px;font-weight:bold;margin-bottom:10px;">Upload Product</h2>
+
+  <label>Crop Name</label>
+  <input style="width:100%;padding:6px;border:1px solid #aaa;margin-bottom:10px;"
+         [(ngModel)]="cropName">
+
+  <label>Soil Type</label>
+  <input style="width:100%;padding:6px;border:1px solid #aaa;margin-bottom:10px;"
+         [(ngModel)]="soilType">
+
+  <label>Pesticides</label>
+  <input style="width:100%;padding:6px;border:1px solid #aaa;margin-bottom:10px;"
+         [(ngModel)]="pesticides">
+
+  <label>Harvest Date</label>
+  <input type="date"
+         style="width:100%;padding:6px;border:1px solid #aaa;margin-bottom:10px;"
+         [(ngModel)]="harvestDate">
+
+  <label>GPS Location</label>
+  <input style="width:100%;padding:6px;border:1px solid #aaa;margin-bottom:8px;"
+         [(ngModel)]="gpsLocation">
+
+  <button style="padding:6px 10px;margin-bottom:10px;"
+          (click)="detectGPS()">
+    Auto Detect GPS
+  </button>
+
+  <label>Image</label><br>
+  <input type="file" (change)="onFileSelected($event)" style="margin-bottom:10px;">
+
+  <div *ngIf="previewUrl" style="margin-bottom:10px;">
+    <img [src]="previewUrl" style="height:120px;border:1px solid #ccc;padding:3px;border-radius:4px;" />
+  </div>
+
+  <button style="width:100%;padding:10px;background:#4caf50;color:white;border-radius:4px;"
+          (click)="uploadProduct()">
+    {{ loading ? "Uploading..." : "Upload Product" }}
+  </button>
+
+</div>

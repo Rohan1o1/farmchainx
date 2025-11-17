@@ -26,6 +26,18 @@ export const routes: Routes = [
     loadComponent: () =>
       import('./pages/dashboard/dashboard').then(m => m.Dashboard)
   },
+  {
+    path: 'upload',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('./pages/upload-product/upload-product').then(m => m.UploadProduct)
+  },
+
+  {
+  path: 'products/my',
+  canActivate: [AuthGuard],
+  loadComponent: () => import('./pages/my-products/my-products').then(m => m.MyProducts)
+},
 
   { path: '**', redirectTo: '' }
 ];
