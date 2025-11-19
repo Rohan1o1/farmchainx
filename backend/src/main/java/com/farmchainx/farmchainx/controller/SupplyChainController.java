@@ -25,7 +25,7 @@ public class SupplyChainController {
         this.userRepository = userRepository;
     }
 
-    @PreAuthorize("hasAnyRole('DISTRIBUTER','RETAILER')")
+    @PreAuthorize("hasAnyRole('DISTRIBUTOR','RETAILER')")
     @PostMapping("/update-chain")
     public ResponseEntity<?> updateChain(@RequestBody Map<String, Object> payload, Principal principal) {
         try {
@@ -40,7 +40,7 @@ public class SupplyChainController {
             SupplyChainLog log;
 
             // ✅ Distributor Logic
-            if (fromUser.hasRole("ROLE_DISTRIBUTER")) {
+            if (fromUser.hasRole("ROLE_DISTRIBUTOR")) {
                 if (payload.get("toUserId") == null)
                     throw new RuntimeException("toUserId is required for distributor updates");
                 Long toUserId = Long.valueOf(payload.get("toUserId").toString());
@@ -62,7 +62,7 @@ public class SupplyChainController {
         }
     }
 
-    @PreAuthorize("hasAnyRole('ADMIN','DISTRIBUTER','RETAILER')")
+    @PreAuthorize("hasAnyRole('ADMIN','DISTRIBUTOR','RETAILER')")
     @GetMapping("/{productId}")
     public ResponseEntity<List<SupplyChainLog>> getProductChain(@PathVariable Long productId) {
         return ResponseEntity.ok(supplyChainService.getLogsByProduct(productId));

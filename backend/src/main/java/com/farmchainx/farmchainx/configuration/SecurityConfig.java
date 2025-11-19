@@ -17,7 +17,7 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import com.farmchainx.farmchainx.jwt.JwtAuthenticationFilter;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true)
+@EnableMethodSecurity(prePostEnabled = true) // Enables @PreAuthorize
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -38,62 +38,59 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-
         http
             .csrf(csrf -> csrf.disable())
-
-            // Return JSON 401/403 so frontend can read the exact reason
-            .exceptionHandling(ex -> ex
-                .authenticationEntryPoint((request, response, authException) -> {
-                    response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"error\":\"Unauthorized\"}");
-                })
-                .accessDeniedHandler((request, response, accessDeniedException) -> {
-                    response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                    response.setContentType("application/json");
-                    response.getWriter().write("{\"error\":\"Forbidden\"}");
-                })
-            )
-
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-            .authorizeHttpRequests(auth -> auth
 
-                    // MUST BE FIRST to avoid 403 on register/login
-                    .requestMatchers("/api/auth/**").permitAll()
-
-                    // Allow Spring Boot default error page
-                    .requestMatchers("/error").permitAll()
-
-                    .requestMatchers("/api/products/*/feedback").permitAll()
-                    .requestMatchers(
-                            "/uploads/**",
-                            "/api/verify/**",
-                            "/api/products/*/qrcode/download"
-                    ).permitAll()
-
-                    // Public product viewing for GETs
-                    .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/*").permitAll()
-
-                    // Product modification endpoints require roles
-                    .requestMatchers("/api/products/**")
-                        .hasAnyRole("FARMER", "DISTRIBUTER", "RETAILER", "ADMIN")
-
-                    // Tracking endpoints
-                    .requestMatchers("/api/track/**")
-                        .hasAnyRole("DISTRIBUTER", "RETAILER", "ADMIN")
-
-                    .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
-
-                    // Admin only
-                    .requestMatchers("/api/admin/**").hasRole("ADMIN")
-
-                    // Everything else authenticated
-                    .anyRequest().authenticated()
+            // Custom JSON error responses for better frontend handling
+            .exceptionHandling(ex -> ex
+                .authenticationEntryPoint((req, res, authEx) -> {
+                    res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+                    res.setContentType("application/json");
+                    res.getWriter().write("{\"error\": \"Unauthorized - Please log in\"}");
+                })
+                .accessDeniedHandler((req, res, accessEx) -> {
+                    res.setStatus(HttpServletResponse.SC_FORBIDDEN);
+                    res.setContentType("application/json");
+                    res.getWriter().write("{\"error\": \"Forbidden - Insufficient permissions\"}");
+                })
             )
+
+            .authorizeHttpRequests(auth -> auth
+                // Public endpoints - NO AUTH REQUIRED
+                .requestMatchers("/api/auth/**").permitAll()                              // login, register, refresh
+                .requestMatchers("/error", "/actuator/**").permitAll()
+                .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
+
+                // Public static files
+                .requestMatchers("/uploads/**").permitAll()
+
+                // QR CODE & PUBLIC VERIFICATION - ANYONE CAN SCAN
+                .requestMatchers("/api/verify/**").permitAll()
+                .requestMatchers("/api/products/*/qrcode/download").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/by-uuid/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/{id}/public").permitAll()
+
+                // Public product listing (for marketplace or search if any)
+                .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
+
+                // Role-based access
+                .requestMatchers("/api/products/upload", "/api/products/**")
+                .hasAnyRole("FARMER", "DISTRIBUTOR", "DISTRIBUTER", "RETAILER", "ADMIN")
+
+            .requestMatchers("/api/track/**")
+                .hasAnyRole("DISTRIBUTOR", "DISTRIBUTER", "RETAILER", "ADMIN", "FARMER")// Farmers can also add notes if needed
+
+                .requestMatchers("/api/admin/**")
+                    .hasRole("ADMIN")
+
+                // Everything else requires authentication
+                .anyRequest().authenticated()
+            )
+
+            // JWT Filter runs before Spring Security's default filter
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
     }
-
 }

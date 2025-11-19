@@ -20,6 +20,11 @@ export const routes: Routes = [
       import('./pages/register/register').then(m => m.Register)
   },
 
+{
+  path: 'verify/:uuid',
+  loadComponent: () => import('./components/verify-product/verify-product').then(m => m.VerifyProduct)
+},
+
   {
     path: 'dashboard',
     canActivate: [AuthGuard],
@@ -31,6 +36,12 @@ export const routes: Routes = [
     canActivate: [AuthGuard],
     loadComponent: () =>
       import('./pages/upload-product/upload-product').then(m => m.UploadProduct)
+  },
+{
+    path: 'scanner',
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./components/qr-scanner/qr-scanner/qr-scanner')
+      .then(m => m.QrScannerComponent)
   },
 
   {

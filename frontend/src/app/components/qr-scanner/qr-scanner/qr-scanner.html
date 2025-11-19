@@ -1,0 +1,69 @@
+
+<div class="min-h-screen bg-gradient-to-b from-green-950 to-black flex flex-col items-center justify-center p-6">
+
+  <div class="bg-white rounded-3xl shadow-2xl p-10 w-full max-w-md">
+
+    <h1 class="text-4xl font-black text-center mb-10 text-green-600">
+      Scan FarmChainX QR
+    </h1>
+
+    <!-- Live Camera Scanner -->
+    <div *ngIf="isScanning && !usingFileUpload">
+      <zxing-scanner
+        [formats]="formats"
+        (scanSuccess)="onScanSuccess($event)"
+        (scanError)="onScanError($event)"
+        (permissionResponse)="onPermission($event)"
+        (camerasFound)="onCamerasFound($event)"
+        [torch]="torchEnabled"
+        class="w-full rounded-2xl overflow-hidden border-4 border-green-500 shadow-2xl">
+      </zxing-scanner>
+
+      <!-- Torch Toggle -->
+      <div class="flex justify-center mt-8" *ngIf="hasTorch">
+        <button (click)="torchEnabled = !torchEnabled"
+                class="bg-yellow-400 hover:bg-yellow-500 text-black font-bold py-4 px-10 rounded-full flex items-center gap-3 shadow-xl transition-all">
+          <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0114 16.5a3.374 3.374 0 01-2.667 3.293l-.548-.547z" />
+          </svg>
+          Torch {{ torchEnabled ? 'ON' : 'OFF' }}
+        </button>
+      </div>
+    </div>
+
+    <!-- File Upload Fallback -->
+    <div *ngIf="!isScanning || usingFileUpload" class="text-center space-y-8">
+      <p class="text-lg text-gray-700 font-medium">
+        Or upload a photo of the QR code
+      </p>
+
+      <label class="cursor-pointer block">
+        <input type="file" accept="image/*" (change)="onFileSelected($event)" class="hidden">
+        <div class="bg-gradient-to-r from-green-600 to-emerald-600 hover:from-green-700 hover:to-emerald-700 text-white font-black text-2xl py-8 px-16 rounded-3xl shadow-2xl transition-all transform hover:scale-105 inline-block">
+          Upload Photo
+        </div>
+      </label>
+
+      <!-- Preview Uploaded Image -->
+      <div *ngIf="uploadedImageUrl" class="mt-8">
+        <img [src]="uploadedImageUrl" class="w-full max-w-sm mx-auto rounded-2xl shadow-2xl border-4 border-green-400">
+        <p class="text-green-600 font-bold text-xl mt-4">Scanning image...</p>
+      </div>
+    </div>
+
+    <!-- Success State -->
+    <div *ngIf="!isScanning && !usingFileUpload" class="text-center py-20">
+      <div class="text-9xl mb-8 animate-bounce">✅</div>
+      <p class="text-4xl font-black text-green-600 mb-8">QR Verified!</p>
+      <button (click)="restart()"
+              class="bg-green-600 hover:bg-green-700 text-white font-bold text-2xl py-6 px-16 rounded-full shadow-2xl transition-all transform hover:scale-105">
+        Scan Another
+      </button>
+    </div>
+
+    <p class="text-center text-gray-500 mt-10 text-sm">
+      Point camera at QR code or upload a clear photo
+    </p>
+  </div>
+</div>

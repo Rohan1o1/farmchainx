@@ -28,7 +28,7 @@ import com.farmchainx.farmchainx.repository.UserRepository;
         public void run(String... args) {
 
             // ✅ 1) Create all roles
-            String[] roles = {"ROLE_CONSUMER","ROLE_FARMER","ROLE_DISTRIBUTER","ROLE_RETAILER","ROLE_ADMIN"};
+            String[] roles = {"ROLE_CONSUMER","ROLE_FARMER","ROLE_DISTRIBUTOR","ROLE_RETAILER","ROLE_ADMIN"};
             for (String r : roles) {
                 if (!roleRepo.existsByName(r)) {
                     Role role = new Role();

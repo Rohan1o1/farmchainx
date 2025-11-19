@@ -1,41 +1,69 @@
-<nav style="
-  border-bottom:1px solid #ddd;
-  padding:10px 12px;
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-">
+<!-- navbar.component.html -->
+<nav class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <div class="flex justify-between items-center h-16">
 
-  <!-- LEFT SIDE: ONLY Home -->
-  <div style="display:flex;align-items:center;gap:12px;">
-    <a routerLink="/" routerLinkActive="active" style="font-size:18px;font-weight:600;">
-      Home
-    </a>
-  </div>
+      <!-- LEFT: Logo -->
+      <div class="flex items-center">
+        <a routerLink="/" class="text-2xl font-black text-green-600 hover:text-green-700 transition">
+          FarmChainX
+        </a>
+      </div>
 
-  <!-- RIGHT SIDE -->
-  <div style="display:flex;align-items:center;gap:12px;">
+      <!-- RIGHT: Navigation -->
+      <div class="flex items-center gap-6 text-sm font-medium">
 
-    <!-- Guest -->
-    <ng-container *ngIf="!isLoggedIn">
-      <a routerLink="/login" routerLinkActive="active">Login</a>
-      <a routerLink="/register" routerLinkActive="active">Register</a>
-    </ng-container>
+        <!-- NOT LOGGED IN -->
+        <ng-container *ngIf="!isLoggedIn">
+          <a routerLink="/login" 
+             class="text-gray-700 hover:text-green-600 transition">
+            Login
+          </a>
+          <a routerLink="/register" 
+             class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full transition shadow-md">
+            Register
+          </a>
+        </ng-container>
 
-    <!-- Farmer -->
-    <ng-container *ngIf="isLoggedIn && isFarmer">
-      <a routerLink="/upload" routerLinkActive="active">Upload Product</a>
-      <a routerLink="/products/my" routerLinkActive="active">My Products</a>
-    </ng-container>
+        <!-- LOGGED IN -->
+        <ng-container *ngIf="isLoggedIn">
 
-    <!-- Logged-in -->
-    <ng-container *ngIf="isLoggedIn">
-      <span style="margin-left:6px;color:#333;">{{ userName }}</span>
+          <!-- QR SCANNER BUTTON - Visible to ALL logged-in users -->
+          <a routerLink="/scanner"
+             routerLinkActive="ring-2 ring-green-500"
+             class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full font-semibold transition transform hover:scale-105 shadow-lg">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
+                    d="M12 4v1m6 11h2m-6 5v1m-6-16H5a2 2 0 00-2 2v3m14-5h2a2 2 0 012 2v3m-9 9h.01" />
+            </svg>
+            Scan QR
+          </a>
 
-      <button (click)="logout()" style="padding:6px 10px;border:1px solid #ccc;">
-        Logout
-      </button>
-    </ng-container>
+          <!-- Farmer Specific Links -->
+          <ng-container *ngIf="isFarmer">
+            <a routerLink="/upload" 
+               routerLinkActive="text-green-600 font-bold"
+               class="text-gray-700 hover:text-green-600 transition">
+              Upload
+            </a>
+            <a routerLink="/products/my" 
+               routerLinkActive="text-green-600 font-bold"
+               class="text-gray-700 hover:text-green-600 transition">
+              My Products
+            </a>
+          </ng-container>
 
+          <!-- User Info + Logout -->
+          <div class="flex items-center gap-4 border-l border-gray-300 pl-6">
+            <span class="text-gray-800 font-semibold">{{ userName }}</span>
+            <button (click)="logout()"
+                    class="bg-red-500 hover:bg-red-600 text-white px-4 py-2 rounded-lg transition font-medium">
+              Logout
+            </button>
+          </div>
+
+        </ng-container>
+      </div>
+    </div>
   </div>
 </nav>
