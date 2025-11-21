@@ -13,11 +13,10 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-
 import com.farmchainx.farmchainx.jwt.JwtAuthenticationFilter;
 
 @Configuration
-@EnableMethodSecurity(prePostEnabled = true) // Enables @PreAuthorize
+@EnableMethodSecurity(prePostEnabled = true)
 public class SecurityConfig {
 
     private final JwtAuthenticationFilter jwtAuthFilter;
@@ -41,8 +40,6 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable())
             .sessionManagement(sess -> sess.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-
-            // Custom JSON error responses for better frontend handling
             .exceptionHandling(ex -> ex
                 .authenticationEntryPoint((req, res, authEx) -> {
                     res.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -55,40 +52,25 @@ public class SecurityConfig {
                     res.getWriter().write("{\"error\": \"Forbidden - Insufficient permissions\"}");
                 })
             )
-
             .authorizeHttpRequests(auth -> auth
-                // Public endpoints - NO AUTH REQUIRED
-                .requestMatchers("/api/auth/**").permitAll()                              // login, register, refresh
+                .requestMatchers("/api/auth/**").permitAll()
                 .requestMatchers("/error", "/actuator/**").permitAll()
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/v3/api-docs/**").permitAll()
-
-                // Public static files
                 .requestMatchers("/uploads/**").permitAll()
-
-                // QR CODE & PUBLIC VERIFICATION - ANYONE CAN SCAN
                 .requestMatchers("/api/verify/**").permitAll()
                 .requestMatchers("/api/products/*/qrcode/download").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products/by-uuid/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/products/{id}/public").permitAll()
-
-                // Public product listing (for marketplace or search if any)
+                .requestMatchers(HttpMethod.GET, "/api/products/*/feedbacks").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/products/*/feedback").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/products/*/feedback").hasRole("CONSUMER")
                 .requestMatchers(HttpMethod.GET, "/api/products", "/api/products/**").permitAll()
-
-                // Role-based access
-                .requestMatchers("/api/products/upload", "/api/products/**")
-                .hasAnyRole("FARMER", "DISTRIBUTOR", "DISTRIBUTER", "RETAILER", "ADMIN")
-
-            .requestMatchers("/api/track/**")
-                .hasAnyRole("DISTRIBUTOR", "DISTRIBUTER", "RETAILER", "ADMIN", "FARMER")// Farmers can also add notes if needed
-
-                .requestMatchers("/api/admin/**")
-                    .hasRole("ADMIN")
-
-                // Everything else requires authentication
+                .requestMatchers("/api/products/upload").hasAnyRole("FARMER","ADMIN")
+                .requestMatchers("/api/products/**").hasAnyRole("FARMER","DISTRIBUTOR","RETAILER","ADMIN")
+                .requestMatchers("/api/track/**").hasAnyRole("DISTRIBUTOR","RETAILER","ADMIN","FARMER")
+                .requestMatchers("/api/admin/**").hasRole("ADMIN")
                 .anyRequest().authenticated()
             )
-
-            // JWT Filter runs before Spring Security's default filter
             .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();

@@ -44,10 +44,10 @@ public class AuthService {
 
         String roleInput = request.getRole().trim().toUpperCase();
 
-        if (!Set.of("CONSUMER", "FARMER", "DISTRIBUTER", "RETAILER")
+        if (!Set.of("CONSUMER", "FARMER", "DISTRIBUTOR", "RETAILER")
                 .contains(roleInput)) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Only Consumer, Farmer, Distributer, Retailer allowed");
+                    "Only Consumer, Farmer, Distributor, Retailer allowed");
         }
 
         Role role = roleRepository.findByName("ROLE_" + roleInput)

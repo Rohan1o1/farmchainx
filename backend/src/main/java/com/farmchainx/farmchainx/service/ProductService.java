@@ -122,7 +122,7 @@ public class ProductService {
         }
     }
 
-    // ENHANCED PUBLIC VIEW — Now with beautiful, readable tracking history
+ // inside ProductService
     public Map<String, Object> getPublicView(Long productId) {
         Product product = productRepository.findById(productId)
                 .orElseThrow(() -> new RuntimeException("Product not found"));
@@ -138,31 +138,54 @@ public class ProductService {
         data.put("publicUuid", product.getPublicUuid());
         data.put("qrCodePath", product.getQrCodePath());
 
-        // Beautiful tracking history with fallbacks
+        // Fetch logs in chronological order
         List<SupplyChainLog> logs = supplyChainLogRepository.findByProductIdOrderByTimestampAsc(productId);
 
         List<Map<String, Object>> trackingHistory = logs.stream().map(log -> {
             Map<String, Object> m = new HashMap<>();
+            m.put("id", log.getId());
+            m.put("productId", log.getProductId());
+            m.put("fromUserId", log.getFromUserId());
+            m.put("toUserId", log.getToUserId());
             m.put("location", log.getLocation() != null && !log.getLocation().isBlank() ? log.getLocation() : "Farm Origin");
             m.put("notes", log.getNotes() != null && !log.getNotes().isBlank() ? log.getNotes() : "Product harvested and entered supply chain");
             m.put("timestamp", log.getTimestamp() != null ? log.getTimestamp() : LocalDateTime.now());
             m.put("createdBy", log.getCreatedBy() != null && !log.getCreatedBy().isBlank() ? log.getCreatedBy() : "Farmer");
+            m.put("prevHash", log.getPrevHash());
+            m.put("hash", log.getHash());
+            // NEW: explicit boolean flags so frontend logic can rely on them
+            m.put("confirmed", log.isConfirmed());
+            m.put("confirmedAt", log.getConfirmedAt()); // may be null
+            m.put("confirmedById", log.getConfirmedById()); // may be null
+            m.put("rejected", log.isRejected());
+            m.put("rejectReason", log.getRejectReason());
             return m;
         }).collect(Collectors.toList());
 
-        // Optional: Add initial "harvested" log if history is empty
+        // Keep the "initial harvest" entry consistent
         if (trackingHistory.isEmpty()) {
             Map<String, Object> initial = new HashMap<>();
+            initial.put("id", null);
+            initial.put("productId", product.getId());
+            initial.put("fromUserId", null);
+            initial.put("toUserId", null);
             initial.put("location", "Farm Origin");
             initial.put("notes", "Product harvested and entered the FarmChainX blockchain");
             initial.put("timestamp", product.getHarvestDate() != null ? product.getHarvestDate().atStartOfDay() : LocalDateTime.now());
             initial.put("createdBy", "Farmer");
+            initial.put("prevHash", "");
+            initial.put("hash", "");
+            initial.put("confirmed", false);
+            initial.put("confirmedAt", null);
+            initial.put("confirmedById", null);
+            initial.put("rejected", false);
+            initial.put("rejectReason", null);
             trackingHistory.add(initial);
         }
-
         data.put("trackingHistory", trackingHistory);
         return data;
     }
+
 
     public Map<String, Object> getPublicViewByUuid(String publicUuid) {
         Product product = productRepository.findByPublicUuid(publicUuid)

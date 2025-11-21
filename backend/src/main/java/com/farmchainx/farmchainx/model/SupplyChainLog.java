@@ -11,126 +11,77 @@ public class SupplyChainLog {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Long productId;          // Product being tracked
-    private Long fromUserId;         // Who handed over the product
-    private Long toUserId;           // Who received the product
-    private LocalDateTime timestamp; // When the handover occurred
-    private String location;         // Place of handover (village, warehouse, etc.)
-    private String notes;            // Optional extra details
-    private String prevHash;         // Hash of previous block
-    private String hash;             // Hash of this block for verification
-    
+    private Long productId;
+    private Long fromUserId;
+    private Long toUserId;
+    private LocalDateTime timestamp;
+    private String location;
+    private String notes;
+    private String prevHash;
+    private String hash;
+
     @Column(name = "created_by")
     private String createdBy;
 
-  
-    public SupplyChainLog() {
-    }
+    @Column(name = "confirmed", nullable = false)
+    private boolean confirmed = false;
 
-    
+    @Column(name = "confirmed_at")
+    private LocalDateTime confirmedAt;
 
+    @Column(name = "confirmed_by_id")
+    private Long confirmedById;
 
-    public SupplyChainLog(Long id, Long productId, Long fromUserId, Long toUserId, LocalDateTime timestamp,
-			String location, String notes, String prevHash, String hash, String createdBy) {
-		super();
-		this.id = id;
-		this.productId = productId;
-		this.fromUserId = fromUserId;
-		this.toUserId = toUserId;
-		this.timestamp = timestamp;
-		this.location = location;
-		this.notes = notes;
-		this.prevHash = prevHash;
-		this.hash = hash;
-		this.createdBy = createdBy;
-	}
+    @Column(name = "rejected", nullable = false)
+    private boolean rejected = false;
 
+    @Column(name = "reject_reason")
+    private String rejectReason;
 
+    public SupplyChainLog() {}
 
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-	public String getCreatedBy() {
-		return createdBy;
-	}
+    public Long getProductId() { return productId; }
+    public void setProductId(Long productId) { this.productId = productId; }
 
+    public Long getFromUserId() { return fromUserId; }
+    public void setFromUserId(Long fromUserId) { this.fromUserId = fromUserId; }
 
+    public Long getToUserId() { return toUserId; }
+    public void setToUserId(Long toUserId) { this.toUserId = toUserId; }
 
+    public LocalDateTime getTimestamp() { return timestamp; }
+    public void setTimestamp(LocalDateTime timestamp) { this.timestamp = timestamp; }
 
-	public void setCreatedBy(String createdBy) {
-		this.createdBy = createdBy;
-	}
+    public String getLocation() { return location; }
+    public void setLocation(String location) { this.location = location; }
 
+    public String getNotes() { return notes; }
+    public void setNotes(String notes) { this.notes = notes; }
 
+    public String getPrevHash() { return prevHash; }
+    public void setPrevHash(String prevHash) { this.prevHash = prevHash; }
 
+    public String getHash() { return hash; }
+    public void setHash(String hash) { this.hash = hash; }
 
-	public Long getId() {
-        return id;
-    }
+    public String getCreatedBy() { return createdBy; }
+    public void setCreatedBy(String createdBy) { this.createdBy = createdBy; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public boolean isConfirmed() { return confirmed; }
+    public void setConfirmed(boolean confirmed) { this.confirmed = confirmed; }
 
-    public Long getProductId() {
-        return productId;
-    }
+    public LocalDateTime getConfirmedAt() { return confirmedAt; }
+    public void setConfirmedAt(LocalDateTime confirmedAt) { this.confirmedAt = confirmedAt; }
 
-    public void setProductId(Long productId) {
-        this.productId = productId;
-    }
+    public Long getConfirmedById() { return confirmedById; }
+    public void setConfirmedById(Long confirmedById) { this.confirmedById = confirmedById; }
 
-    public Long getFromUserId() {
-        return fromUserId;
-    }
+    public boolean isRejected() { return rejected; }
+    public void setRejected(boolean rejected) { this.rejected = rejected; }
 
-    public void setFromUserId(Long fromUserId) {
-        this.fromUserId = fromUserId;
-    }
-
-    public Long getToUserId() {
-        return toUserId;
-    }
-
-    public void setToUserId(Long toUserId) {
-        this.toUserId = toUserId;
-    }
-
-    public LocalDateTime getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(LocalDateTime timestamp) {
-        this.timestamp = timestamp;
-    }
-
-    public String getLocation() {
-        return location;
-    }
-
-    public void setLocation(String location) {
-        this.location = location;
-    }
-
-    public String getNotes() {
-        return notes;
-    }
-
-    public void setNotes(String notes) {
-        this.notes = notes;
-    }
-
-    public String getPrevHash() {
-        return prevHash;
-    }
-
-    public void setPrevHash(String prevHash) {
-        this.prevHash = prevHash;
-    }
-
-    public String getHash() {
-        return hash;
-    }
-
-    public void setHash(String hash) {
-        this.hash = hash;
-    }
+    public String getRejectReason() { return rejectReason; }
+    public void setRejectReason(String rejectReason) { this.rejectReason = rejectReason; }
 }
