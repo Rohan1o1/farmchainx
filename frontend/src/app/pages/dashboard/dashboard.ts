@@ -1,24 +1,34 @@
-import { Component } from '@angular/core';
+import { Component, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../services/auth.service';
+import { AdminService } from '../../services/admin.service';
 
 @Component({
   standalone: true,
+  imports: [CommonModule, RouterLink],
   selector: 'app-dashboard',
-  templateUrl: './dashboard.html',
-  imports: [CommonModule]
+  templateUrl: './dashboard.html'
 })
 export class Dashboard {
-  name: string | null = localStorage.getItem('fcx_name') || localStorage.getItem('fcx_email');
-  role: string | null = localStorage.getItem('fcx_role');
+  private authService = inject(AuthService);
+  private adminService = inject(AdminService);
+  private router = inject(Router);
 
-  constructor(private router: Router) {}
+  // These are now 100% safe — no initialization error
+  name = this.authService.getName() || 'User';
+  role = (this.authService.getRole()?.replace('ROLE_', '') || 'USER');
+  isAdmin = this.authService.isAdmin();
 
   logout() {
-    localStorage.removeItem('fcx_token');
-    localStorage.removeItem('fcx_role');
-    localStorage.removeItem('fcx_email');
-    localStorage.removeItem('fcx_name');
+    this.authService.logout();
     this.router.navigate(['/login']);
+  }
+
+  requestAdminAccess() {
+    this.adminService.requestAdminAccess().subscribe({
+      next: () => alert('Admin access requested!'),
+      error: () => alert('Already requested or you are admin')
+    });
   }
 }

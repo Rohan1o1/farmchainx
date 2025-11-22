@@ -29,9 +29,8 @@ export class VerifyProduct implements OnInit {
 
   userRole: 'Guest' | 'Farmer' | 'Distributor' | 'Retailer' | 'Admin' | 'Consumer' = 'Guest';
 
-  // --- Feedback related ---
   feedbacks: any[] = [];
-  consumerCanGiveFeedback = false; // controlled by server (/verify response)
+  consumerCanGiveFeedback = false;
   myRating = 5;
   myComment = '';
 
@@ -46,7 +45,6 @@ export class VerifyProduct implements OnInit {
   private readRoleFromToken() {
     const token = localStorage.getItem('fcx_token') || localStorage.getItem('token') || localStorage.getItem('jwt') || null;
     const storedRole = localStorage.getItem('fcx_role') || localStorage.getItem('role') || null;
-    const storedEmail = localStorage.getItem('fcx_email') || localStorage.getItem('email') || null;
 
     if (storedRole) {
       const rn = storedRole.toUpperCase().replace(/^ROLE_/, '');
@@ -58,71 +56,29 @@ export class VerifyProduct implements OnInit {
       else this.userRole = 'Guest';
     }
 
-    if (!token) {
-      if (!this.userRole || this.userRole === 'Guest') {
-        this.userRole = this.userRole || 'Guest';
-      }
-      return;
-    }
+    if (!token) return;
 
     try {
       const parts = token.split('.');
       if (parts.length < 2) return;
       const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
 
-      this.currentUserId =
-        payload.userId ||
-        payload.id ||
-        payload.sub ||
-        payload.user?.id ||
-        payload.userIdString ||
-        null;
-
-      if (!storedRole) {
-        let rawRoles: any[] = [];
-        if (Array.isArray(payload.roles)) rawRoles = payload.roles;
-        else if (Array.isArray(payload.authorities)) rawRoles = payload.authorities;
-        else if (payload.role) rawRoles = [payload.role];
-        else if (payload.user && Array.isArray(payload.user.roles)) rawRoles = payload.user.roles;
-
-        const roleNames = rawRoles.map((r: any) => {
-          if (!r) return '';
-          if (typeof r === 'string') return r;
-          if (typeof r === 'object') return r.name || r.authority || r.role || '';
-          return String(r);
-        }).filter(Boolean).map((s: string) => s.toUpperCase().replace(/^ROLE_/, ''));
-
-        if (roleNames.some((r: string) => r.includes('DISTRIBUTOR'))) this.userRole = 'Distributor';
-        else if (roleNames.some((r: string) => r.includes('RETAILER'))) this.userRole = 'Retailer';
-        else if (roleNames.some((r: string) => r.includes('FARMER'))) this.userRole = 'Farmer';
-        else if (roleNames.some((r: string) => r.includes('ADMIN'))) this.userRole = 'Admin';
-        else if (roleNames.some((r: string) => r.includes('CONSUMER'))) this.userRole = 'Consumer';
-        else this.userRole = this.userRole || 'Guest';
-      }
-
+      this.currentUserId = payload.userId || payload.id || payload.sub || payload.user?.id || null;
       if (this.userRole === 'Distributor') this.loadRetailers();
-    } catch (e) {
-      console.warn('Failed to decode token', e);
-    }
+    } catch (e) {}
   }
 
   private loadProduct() {
     this.loading = true;
     this.http.get(`/api/verify/${this.uuid}`).subscribe({
       next: (data: any) => {
-        console.log('verify response', data);
         this.product = data;
         this.canUpdate = (data && data.canUpdate === true) || (this.userRole === 'Distributor' || this.userRole === 'Retailer');
-        // server-provided flag controlling feedback permission to avoid extra round-trips
         this.consumerCanGiveFeedback = data.canGiveFeedback === true;
         this.loading = false;
-        if (data.gpsLocation?.includes(',')) {
-          this.displayLocation = 'Protected Farm Location';
-        }
-        // load feedbacks (public)
+        this.displayLocation = data.displayLocation || data.gpsLocation || '';
         this.loadFeedbacks();
       },
-
       error: () => {
         this.error = 'Invalid or expired QR code • Product not found';
         this.loading = false;
@@ -132,18 +88,16 @@ export class VerifyProduct implements OnInit {
 
   private loadRetailers() {
     this.http.get<any[]>('/api/track/users/retailers').subscribe({
-      next: (data) => this.retailers = data
+      next: (data) => (this.retailers = data)
     });
   }
 
-  // --- Feedback methods ---
   private loadFeedbacks() {
     if (!this.product?.productId) return;
-if (!this.product?.productId) return;
-this.http.get<any[]>(`/api/products/${this.product.productId}/feedbacks`).subscribe({
-  next: (list) => this.feedbacks = list || [],
-  error: (err) => console.warn('Failed loading feedbacks', err)
-});
+    this.http.get<any[]>(`/api/products/${this.product.productId}/feedbacks`).subscribe({
+      next: (list) => (this.feedbacks = list || []),
+      error: () => {}
+    });
   }
 
   submitFeedback() {
@@ -156,19 +110,13 @@ this.http.get<any[]>(`/api/products/${this.product.productId}/feedbacks`).subscr
       alert('Rating must be between 1 and 5');
       return;
     }
-    const payload = {
-      rating,
-      comment: (this.myComment || '').trim()
-    };
+    const payload = { rating, comment: (this.myComment || '').trim() };
     this.http.post(`/api/products/${this.product.productId}/feedback`, payload).subscribe({
-      next: (res: any) => {
+      next: () => {
         alert('Thanks for your feedback!');
-        // disable further feedback attempts locally (server-side uniqueness still enforced)
         this.consumerCanGiveFeedback = false;
-        // clear form input
         this.myRating = 5;
         this.myComment = '';
-        // refresh feedbacks shown
         this.loadFeedbacks();
       },
       error: (err) => {
@@ -176,45 +124,35 @@ this.http.get<any[]>(`/api/products/${this.product.productId}/feedbacks`).subscr
       }
     });
   }
-  // --- end feedback methods ---
 
   hasTakenFromFarmer(): boolean {
     if (!this.product?.trackingHistory?.length || !this.currentUserId) return false;
     const lastLog = this.product.trackingHistory[this.product.trackingHistory.length - 1];
     const lastTo = lastLog?.toUserId != null ? Number(lastLog.toUserId) : null;
     const myId = this.currentUserId != null ? Number(this.currentUserId) : null;
-    // ensure confirmed defaults to false if absent
     const confirmed = typeof lastLog?.confirmed === 'boolean' ? lastLog.confirmed : false;
     return lastTo === myId && confirmed === true;
   }
 
   showUpdatePossible(): boolean {
     if (!this.canUpdate) return false;
-
-    // If there's no history, distributor can start by taking product from farmer
     if (!this.product?.trackingHistory || this.product.trackingHistory.length === 0) {
       return this.userRole === 'Distributor';
     }
-
     const lastLog = this.product.trackingHistory[this.product.trackingHistory.length - 1];
     const lastFrom = lastLog?.fromUserId != null ? Number(lastLog.fromUserId) : null;
     const lastTo = lastLog?.toUserId != null ? Number(lastLog.toUserId) : null;
     const myId = this.currentUserId != null ? Number(this.currentUserId) : null;
     const confirmed = typeof lastLog?.confirmed === 'boolean' ? lastLog.confirmed : false;
     const rejected = typeof lastLog?.rejected === 'boolean' ? lastLog.rejected : false;
-
     if (this.userRole === 'Distributor') {
       if (lastFrom == null && lastTo == null) return true;
-      if (lastTo === myId) {
-        return !rejected;
-      }
+      if (lastTo === myId) return !rejected;
       return false;
     }
-
     if (this.userRole === 'Retailer') {
       return lastTo === myId && confirmed === false && rejected === false;
     }
-
     return false;
   }
 
@@ -232,12 +170,7 @@ this.http.get<any[]>(`/api/products/${this.product.productId}/feedbacks`).subscr
       alert('Location is required');
       return;
     }
-
-    const payload: any = {
-      location: this.newLocation.trim(),
-      note: this.newNote.trim() || undefined
-    };
-
+    const payload: any = { location: this.newLocation.trim(), note: this.newNote.trim() || undefined };
     if (this.isFinalHandover) {
       if (!this.selectedRetailerId) {
         alert('Please select a retailer');
@@ -245,7 +178,6 @@ this.http.get<any[]>(`/api/products/${this.product.productId}/feedbacks`).subscr
       }
       payload.toUserId = this.selectedRetailerId;
     }
-
     this.http.post(`/api/verify/${this.uuid}/track`, payload).subscribe({
       next: () => {
         alert('Success!');

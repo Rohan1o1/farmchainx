@@ -1,4 +1,3 @@
-<!-- navbar.component.html -->
 <nav class="sticky top-0 z-50 bg-white border-b border-gray-200 shadow-sm">
   <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
     <div class="flex justify-between items-center h-16">
@@ -15,10 +14,7 @@
 
         <!-- NOT LOGGED IN -->
         <ng-container *ngIf="!isLoggedIn">
-          <a routerLink="/login" 
-             class="text-gray-700 hover:text-green-600 transition">
-            Login
-          </a>
+          <a routerLink="/login" class="text-gray-700 hover:text-green-600 transition">Login</a>
           <a routerLink="/register" 
              class="bg-green-600 hover:bg-green-700 text-white px-5 py-2 rounded-full transition shadow-md">
             Register
@@ -28,7 +24,7 @@
         <!-- LOGGED IN -->
         <ng-container *ngIf="isLoggedIn">
 
-          <!-- QR SCANNER BUTTON - Visible to ALL logged-in users -->
+          <!-- QR Scanner Button -->
           <a routerLink="/scanner"
              routerLinkActive="ring-2 ring-green-500"
              class="flex items-center gap-2 bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full font-semibold transition transform hover:scale-105 shadow-lg">
@@ -39,19 +35,22 @@
             Scan QR
           </a>
 
-          <!-- Farmer Specific Links -->
+          <!-- Farmer Links -->
           <ng-container *ngIf="isFarmer">
-            <a routerLink="/upload" 
-               routerLinkActive="text-green-600 font-bold"
-               class="text-gray-700 hover:text-green-600 transition">
-              Upload
-            </a>
-            <a routerLink="/products/my" 
-               routerLinkActive="text-green-600 font-bold"
-               class="text-gray-700 hover:text-green-600 transition">
-              My Products
-            </a>
+            <a routerLink="/upload" routerLinkActive="text-green-600 font-bold"
+               class="text-gray-700 hover:text-green-600 transition">Upload</a>
+            <a routerLink="/products/my" routerLinkActive="text-green-600 font-bold"
+               class="text-gray-700 hover:text-green-600 transition">My Products</a>
           </ng-container>
+
+          <!-- ADMIN PANEL BUTTON — ONLY FOR ADMINS -->
+          <a routerLink="/admin" *ngIf="isAdmin"
+             class="flex items-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-6 py-3 rounded-full font-bold text-lg shadow-xl transform hover:scale-110 transition duration-300">
+            <svg class="w-6 h-6" fill="currentColor" viewBox="0 0 20 20">
+              <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
+            </svg>
+            Admin Panel
+          </a>
 
           <!-- User Info + Logout -->
           <div class="flex items-center gap-4 border-l border-gray-300 pl-6">

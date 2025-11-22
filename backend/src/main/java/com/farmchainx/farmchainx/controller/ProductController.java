@@ -80,7 +80,7 @@ public class ProductController {
                 } catch (DateTimeParseException ex) {
                     String cleaned = harvestDate.replace(" ", "").replace("−", "-").replace("—", "-").replace("/", "-");
                     parsedDate = LocalDate.parse(cleaned, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-                }
+                } 
             }
 
             Product product = new Product();
@@ -90,22 +90,27 @@ public class ProductController {
             product.setHarvestDate(parsedDate);
             product.setGpsLocation(gpsLocation);
             product.setImagePath(imagePath);
-            product.setQualityGrade("Pending");
-            product.setConfidenceScore(0.0);
             product.setFarmer(farmer);
+
+            // do NOT preset these — let AI fill them, null means "pending"
+            product.setQualityGrade(null);
+            product.setConfidenceScore(null);
 
             Product saved = productService.saveProduct(product);
             saved.ensurePublicUuid();
             productRepository.save(saved);
 
-            return ResponseEntity.ok(Map.of("id", saved.getId(), "message", "Product uploaded successfully"));
-        } catch (RuntimeException re) {
-            return ResponseEntity.badRequest().body(Map.of("error", re.getMessage()));
-        } catch (Exception ex) {
-            ex.printStackTrace();
-            return ResponseEntity.status(500).body(Map.of("error", "Internal server error"));
+            return ResponseEntity.ok(Map.of(
+                "id", saved.getId(),
+                "message", "Product uploaded successfully",
+                "qualityGrade", saved.getQualityGrade(),
+                "confidenceScore", saved.getConfidenceScore()
+            ));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(Map.of("error", "Upload failed: " + e.getMessage()));
         }
     }
+
 
     @PreAuthorize("hasRole('FARMER')")
     @GetMapping("/products/my")

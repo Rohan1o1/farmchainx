@@ -1,0 +1,27 @@
+<aside class="w-72 bg-gradient-to-b from-indigo-800 to-indigo-900 text-white flex flex-col">
+  <div class="p-8 border-b border-indigo-700">
+    <h2 class="text-3xl font-bold">FarmChainX</h2>
+    <p class="text-indigo-200 text-sm mt-2">Admin Dashboard</p>
+  </div>
+
+  <nav class="flex-1 px-6 py-8 space-y-2">
+    <a routerLink="/admin/overview"
+       routerLinkActive="bg-white/10 border-l-4 border-white"
+       class="flex items-center px-6 py-4 rounded-lg hover:bg-white/10 transition text-lg font-medium">
+      <span>Overview</span>
+    </a>
+
+    <a routerLink="/admin/users"
+       routerLinkActive="bg-white/10 border-l-4 border-white"
+       class="flex items-center px-6 py-4 rounded-lg hover:bg-white/10 transition text-lg font-medium">
+      <span>All Users</span>
+    </a>
+
+    <a routerLink="/admin/promotion-requests"
+       routerLinkActive="bg-white/10 border-l-4 border-white"
+       class="flex items-center px-6 py-4 rounded-lg hover:bg-white/10 transition text-lg font-medium relative">
+      <span>Admin Requests</span>
+      <span class="ml-auto bg-red-500 text-xs px-3 py-1 rounded-full">LIVE</span>
+    </a>
+  </nav>
+</aside>

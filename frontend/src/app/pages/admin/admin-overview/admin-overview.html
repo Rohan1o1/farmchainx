@@ -1,0 +1,25 @@
+<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mt-8">
+  <div class="bg-gradient-to-br from-indigo-500 to-indigo-700 rounded-3xl shadow-2xl p-10 text-white transform hover:scale-105 transition-all duration-300">
+    <h3 class="text-indigo-100 text-xl font-semibold">Total Users</h3>
+    <p class="text-7xl font-bold mt-6">{{ data?.totalUsers || 0 }}</p>
+    <p class="text-indigo-200 mt-3 text-lg">Active accounts</p>
+  </div>
+
+  <div class="bg-gradient-to-br from-emerald-500 to-teal-600 rounded-3xl shadow-2xl p-10 text-white transform hover:scale-105 transition-all duration-300">
+    <h3 class="text-emerald-100 text-xl font-semibold">Total Products</h3>
+    <p class="text-7xl font-bold mt-6">{{ data?.totalProducts || 0 }}</p>
+    <p class="text-emerald-200 mt-3 text-lg">In supply chain</p>
+  </div>
+
+  <div class="bg-gradient-to-br from-blue-500 to-cyan-600 rounded-3xl shadow-2xl p-10 text-white transform hover:scale-105 transition-all duration-300">
+    <h3 class="text-blue-100 text-xl font-semibold">Supply Logs</h3>
+    <p class="text-7xl font-bold mt-6">{{ data?.totalLogs || 0 }}</p>
+    <p class="text-blue-200 mt-3 text-lg">Blockchain entries</p>
+  </div>
+
+  <div class="bg-gradient-to-br from-purple-500 to-pink-600 rounded-3xl shadow-2xl p-10 text-white transform hover:scale-105 transition-all duration-300">
+    <h3 class="text-purple-100 text-xl font-semibold">Feedbacks</h3>
+    <p class="text-7xl font-bold mt-6">{{ data?.totalFeedbacks || 0 }}</p>
+    <p class="text-purple-200 mt-3 text-lg">Consumer reviews</p>
+  </div>
+</div>

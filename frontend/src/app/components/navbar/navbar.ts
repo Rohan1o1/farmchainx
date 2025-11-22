@@ -14,19 +14,24 @@ export class Navbar {
   private auth = inject(AuthService);
 
   get isLoggedIn() {
-    return !!localStorage.getItem('fcx_token');
+    return this.auth.isLoggedIn();
   }
 
   get userRole() {
-    return localStorage.getItem('fcx_role');
+    return this.auth.getRole();
   }
 
   get userName() {
-    return localStorage.getItem('fcx_name') || localStorage.getItem('fcx_email');
+    return this.auth.getName();
   }
 
   get isFarmer() {
-    return this.userRole === 'ROLE_FARMER';
+    return this.auth.hasRole('ROLE_FARMER');
+  }
+
+  // THIS MAKES THE ADMIN BUTTON APPEAR
+  get isAdmin() {
+    return this.auth.isAdmin();
   }
 
   logout() {

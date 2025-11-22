@@ -1,0 +1,43 @@
+<div class="bg-white rounded-2xl shadow-xl overflow-hidden">
+  <div class="px-8 py-6 bg-gradient-to-r from-indigo-600 to-purple-600">
+    <h2 class="text-3xl font-bold text-white">All Users</h2>
+    <p class="text-indigo-100 mt-2">Manage roles and permissions</p>
+  </div>
+
+  <div class="overflow-x-auto">
+    <table class="w-full">
+      <thead class="bg-gray-50 border-b border-gray-200">
+        <tr>
+          <th class="px-8 py-5 text-left text-sm font-semibold text-gray-700">Name</th>
+          <th class="px-8 py-5 text-left text-sm font-semibold text-gray-700">Email</th>
+          <th class="px-8 py-5 text-left text-sm font-semibold text-gray-700">Current Roles</th>
+          <th class="px-8 py-5 text-left text-sm font-semibold text-gray-700">Action</th>
+        </tr>
+      </thead>
+      <tbody class="divide-y divide-gray-200">
+        <tr *ngFor="let user of users" class="hover:bg-gray-50 transition">
+          <td class="px-8 py-6 font-medium text-gray-900">{{ user.name }}</td>
+          <td class="px-8 py-6">
+            <span class="text-indigo-600 font-medium">{{ user.email }}</span>
+          </td>
+          <td class="px-8 py-6">
+            <span class="inline-flex items-center px-4 py-2 rounded-full text-xs font-semibold"
+                  [class]="user.isAdmin 
+                    ? 'bg-purple-100 text-purple-800' 
+                    : 'bg-gray-100 text-gray-700'">
+              {{ user.isAdmin ? 'ADMIN' : user.roles.join(', ') || 'USER' }}
+            </span>
+          </td>
+          <td class="px-8 py-6">
+            <button *ngIf="!user.isAdmin"
+                    (click)="promote(user.id)"
+                    class="bg-gradient-to-r from-indigo-600 to-purple-600 hover:from-indigo-700 hover:to-purple-700 text-white font-bold py-3 px-6 rounded-xl shadow-lg transform hover:scale-105 transition">
+              Promote to Admin
+            </button>
+            <span *ngIf="user.isAdmin" class="text-green-600 font-bold text-lg">✔ Admin</span>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
