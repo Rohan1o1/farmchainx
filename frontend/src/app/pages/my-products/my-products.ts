@@ -1,9 +1,8 @@
-// src/app/pages/my-products/my-products.component.ts
-
 import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
+import { catchError, delay, retryWhen, scan, throwError } from 'rxjs';
 
 @Component({
   standalone: true,
@@ -13,34 +12,68 @@ import { Router } from '@angular/router';
 export class MyProducts {
   products: any[] = [];
   loading = true;
+  retryMessage = '';
+  page = 0;
+  size = 9;
+  totalPages = 0;
 
   constructor(private http: HttpClient, private router: Router) {
     this.load();
   }
 
-  load() {
+  load(page: number = 0) {
     this.loading = true;
-    this.http.get<any[]>('/api/products/my').subscribe({
-      next: (res) => {
-        this.products = Array.isArray(res) ? res : [];
-        this.loading = false;
-      },
-      error: () => {
-        alert('Failed to load products');
-        this.loading = false;
-      }
-    });
+    this.retryMessage = '';
+
+    this.http
+      .get<any>(`/api/products/my?page=${page}&size=${this.size}&sort=id,desc`)
+      .pipe(
+        retryWhen(errors =>
+          errors.pipe(
+            scan((retryCount) => {
+              retryCount++;
+              if (retryCount > 3) throw errors;
+              this.retryMessage = `🔁 Reconnecting... (Attempt ${retryCount} of 3)`;
+              return retryCount;
+            }, 0),
+            delay(1000) // exponential backoff could be delay(500 * Math.pow(2, retryCount))
+          )
+        ),
+        catchError(err => {
+          this.retryMessage = '';
+          this.loading = false;
+          alert('❌ Failed to load products after multiple attempts.');
+          return throwError(() => err);
+        })
+      )
+      .subscribe({
+        next: (res) => {
+          this.products = res?.content || [];
+          this.page = res?.number || 0;
+          this.totalPages = res?.totalPages || 1;
+          this.loading = false;
+          this.retryMessage = '';
+        }
+      });
   }
 
-  // AUTO-DOWNLOAD + PERFECT FILENAME
+  nextPage() {
+    if (this.page < this.totalPages - 1) this.load(this.page + 1);
+  }
+
+  prevPage() {
+    if (this.page > 0) this.load(this.page - 1);
+  }
+
   generateQr(id: number) {
     this.http.post<any>(`/api/products/${id}/qrcode`, {}).subscribe({
       next: (res) => {
         const product = this.products.find(p => p.id === id)!;
-        const url = res.qrPath.startsWith('http') ? res.qrPath : `http://localhost:8080${res.qrPath}`;
+        const url = res.qrPath.startsWith('http')
+          ? res.qrPath
+          : `http://localhost:8080${res.qrPath}`;
         const filename = this.generateFilename(product);
 
-        // Trigger auto-download
         const link = document.createElement('a');
         link.href = url;
         link.download = filename;
@@ -49,7 +82,7 @@ export class MyProducts {
         document.body.removeChild(link);
 
         alert(`QR Generated & Downloaded: ${filename}`);
-        this.load(); // refresh preview
+        this.load(this.page);
       },
       error: (err) => alert(err.error?.message || 'Failed to generate QR')
     });
@@ -70,7 +103,6 @@ export class MyProducts {
     document.body.removeChild(link);
   }
 
-  // Perfect filename: QR_Red-Onion_47.png
   private generateFilename(product: any): string {
     const cleanName = (product.cropName || 'Product')
       .replace(/[^a-zA-Z0-9]/g, '-')
@@ -79,7 +111,6 @@ export class MyProducts {
     return `QR_${cleanName}_${product.id}.png`;
   }
 
-  // Helpers
   getImageUrl(path: string): string {
     return path?.startsWith('http') ? path : `http://localhost:8080${path}`;
   }
@@ -90,17 +121,22 @@ export class MyProducts {
 
   formatDate(date: string | null): string {
     if (!date) return 'Unknown Date';
-    return new Date(date).toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+    return new Date(date).toLocaleDateString('en-US', {
+      month: 'long',
+      day: 'numeric',
+      year: 'numeric'
+    });
   }
 
   getCropEmoji(name: string): string {
     const n = (name || '').toLowerCase();
     const map: Record<string, string> = {
-      onion: 'Onion', tomato: 'Tomato', mango: 'Mango', potato: 'Potato',
-      rice: 'Ear of Rice', banana: 'Banana', apple: 'Apple', orange: 'Orange',
-      grape: 'Grapes', wheat: 'Wheat', corn: 'Ear of Corn', carrot: 'Carrot',
-      cucumber: 'Cucumber', strawberry: 'Strawberry', watermelon: 'Watermelon'
+      onion: '🧅', tomato: '🍅', mango: '🥭', potato: '🥔', rice: '🌾',
+      banana: '🍌', apple: '🍎', orange: '🍊', grape: '🍇', wheat: '🌿',
+      corn: '🌽', carrot: '🥕', cucumber: '🥒', strawberry: '🍓', watermelon: '🍉'
     };
-    return Object.keys(map).find(k => n.includes(k)) ? map[Object.keys(map).find(k => n.includes(k))!] : 'Seedling';
+    return Object.keys(map).find(k => n.includes(k))
+      ? map[Object.keys(map).find(k => n.includes(k))!]
+      : '🌱';
   }
 }

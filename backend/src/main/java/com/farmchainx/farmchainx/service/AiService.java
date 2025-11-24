@@ -5,10 +5,13 @@ import java.awt.*;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.Path;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -18,7 +21,20 @@ public class AiService {
     private final Random random = new Random();
 
     public Map<String, Object> predictQuality(String imagePath) throws IOException {
-        BufferedImage img = ImageIO.read(new File(imagePath));
+        BufferedImage img;
+
+        if (imagePath != null && (imagePath.startsWith("http://") || imagePath.startsWith("https://"))) {
+            URL url = new URL(imagePath);
+            URLConnection conn = url.openConnection();
+            conn.setConnectTimeout(5000);
+            conn.setReadTimeout(10000);
+            try (var in = conn.getInputStream()) {
+                img = ImageIO.read(in);
+            }
+        } else {
+            img = ImageIO.read(new File(imagePath));
+        }
+
         if (img == null) throw new IOException("Unsupported image format for: " + imagePath);
 
         if (img.getWidth() > 800) {
@@ -41,21 +57,29 @@ public class AiService {
         return result;
     }
 
-    // --- helper methods below ---
     private String guessCropFromFilename(String path) {
-        String name = Path.of(path).getFileName().toString().toLowerCase();
-        if (name.contains("mango")) return "mango";
-        if (name.contains("tomato")) return "tomato";
-        if (name.contains("apple")) return "apple";
-        if (name.contains("banana")) return "banana";
-        if (name.contains("potato")) return "potato";
-        if (name.contains("orange") || name.contains("kinnow")) return "orange";
+        try {
+            String name;
+            if (path != null && (path.startsWith("http://") || path.startsWith("https://"))) {
+                String p = new URL(path).getPath();
+                int slash = p.lastIndexOf('/');
+                name = (slash >= 0 ? p.substring(slash + 1) : p).toLowerCase();
+            } else {
+                name = Path.of(path).getFileName().toString().toLowerCase();
+            }
+            if (name.contains("mango")) return "mango";
+            if (name.contains("tomato")) return "tomato";
+            if (name.contains("apple")) return "apple";
+            if (name.contains("banana")) return "banana";
+            if (name.contains("potato")) return "potato";
+            if (name.contains("orange") || name.contains("kinnow")) return "orange";
+        } catch (Exception ignored) {}
         return "unknown";
     }
 
     private String determineGrade(String crop, double red, double green, double yellow, double bad, double uniform) {
         boolean hasDamage = bad > 0.18 || uniform < 0.45;
-        if (hasDamage) return "C"; // never reject
+        if (hasDamage) return "C";
 
         return switch (crop) {
             case "mango", "tomato", "apple" ->
@@ -130,3 +154,13 @@ public class AiService {
         boolean test(Color c);
     }
 }
+
+
+
+
+
+
+
+
+
+

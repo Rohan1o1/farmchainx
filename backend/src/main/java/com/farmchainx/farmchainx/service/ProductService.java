@@ -50,11 +50,10 @@ public class ProductService {
             if (path == null || path.isBlank()) {
                 throw new IllegalStateException("Image path missing for grading");
             }
-            java.io.File f = new java.io.File(path);
-            if (!f.exists() || !f.isFile()) {
-                throw new IOException("Image file not found at: " + path);
-            }
+
+            // ✅ Let AiService handle URL or local file. Do NOT pre-check with File.exists() here.
             Map<String, Object> aiResult = aiService.predictQuality(path);
+
             if (aiResult != null && aiResult.get("grade") != null && aiResult.get("confidence") != null) {
                 saved.setQualityGrade(String.valueOf(aiResult.get("grade")));
                 saved.setConfidenceScore(Double.parseDouble(aiResult.get("confidence").toString()));
@@ -63,6 +62,7 @@ public class ProductService {
                 throw new IllegalStateException("AI returned empty result");
             }
         } catch (Exception e) {
+            // Non-fatal: keep the product, leave grading as pending
             System.err.println("[AI Grading Error] " + e.getClass().getSimpleName() + ": " + e.getMessage());
             return saved;
         }
@@ -87,10 +87,12 @@ public class ProductService {
         product.ensurePublicUuid();
         productRepository.save(product);
         String publicUuid = product.getPublicUuid();
+
         String frontendBase = System.getenv("FRONTEND_URL");
         if (frontendBase == null || frontendBase.isBlank()) {
             frontendBase = "http://localhost:4200";
         }
+
         String qrText = frontendBase + "/verify/" + publicUuid;
         try {
             Path qrDir = Path.of("uploads", "qrcodes");
@@ -136,6 +138,7 @@ public class ProductService {
         data.put("productId", product.getId());
         data.put("publicUuid", product.getPublicUuid());
         data.put("qrCodePath", product.getQrCodePath());
+
         List<SupplyChainLog> logs = supplyChainLogRepository.findByProductIdOrderByTimestampAsc(productId);
         List<Map<String, Object>> trackingHistory = logs.stream().map(log -> {
             Map<String, Object> m = new HashMap<>();
@@ -156,6 +159,7 @@ public class ProductService {
             m.put("rejectReason", log.getRejectReason());
             return m;
         }).collect(Collectors.toList());
+
         if (trackingHistory.isEmpty()) {
             Map<String, Object> initial = new HashMap<>();
             initial.put("id", null);
@@ -175,6 +179,7 @@ public class ProductService {
             initial.put("rejectReason", null);
             trackingHistory.add(initial);
         }
+
         data.put("trackingHistory", trackingHistory);
         return data;
     }

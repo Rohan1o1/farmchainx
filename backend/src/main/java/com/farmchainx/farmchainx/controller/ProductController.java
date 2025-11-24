@@ -10,6 +10,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
@@ -66,12 +69,14 @@ public class ProductController {
             User farmer = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Farmer not found"));
 
-            String uploadDir = System.getProperty("user.dir") + java.io.File.separator + "uploads";
-            java.io.File folder = new java.io.File(uploadDir);
-            if (!folder.exists()) folder.mkdirs();
-
-            String imagePath = uploadDir + java.io.File.separator + System.currentTimeMillis() + "_" + imageFile.getOriginalFilename();
-            imageFile.transferTo(new java.io.File(imagePath));
+            com.cloudinary.Cloudinary cloudinary = new com.cloudinary.Cloudinary(
+                "cloudinary://277141844455857:97X4bTcgIE4UpDdJOdUh719uJiw@dyxha7yei"
+            );
+            java.util.Map uploadResult = cloudinary.uploader().upload(
+                imageFile.getBytes(),
+                com.cloudinary.utils.ObjectUtils.asMap("folder", "farmchainx/products")
+            );
+            String imagePath = uploadResult.get("secure_url").toString();
 
             LocalDate parsedDate = null;
             if (harvestDate != null && !harvestDate.isBlank()) {
@@ -80,7 +85,7 @@ public class ProductController {
                 } catch (DateTimeParseException ex) {
                     String cleaned = harvestDate.replace(" ", "").replace("−", "-").replace("—", "-").replace("/", "-");
                     parsedDate = LocalDate.parse(cleaned, DateTimeFormatter.ofPattern("dd-MM-yyyy"));
-                } 
+                }
             }
 
             Product product = new Product();
@@ -91,8 +96,6 @@ public class ProductController {
             product.setGpsLocation(gpsLocation);
             product.setImagePath(imagePath);
             product.setFarmer(farmer);
-
-            // do NOT preset these — let AI fill them, null means "pending"
             product.setQualityGrade(null);
             product.setConfidenceScore(null);
 
@@ -101,28 +104,43 @@ public class ProductController {
             productRepository.save(saved);
 
             return ResponseEntity.ok(Map.of(
-                "id", saved.getId(),
-                "message", "Product uploaded successfully",
-                "qualityGrade", saved.getQualityGrade(),
-                "confidenceScore", saved.getConfidenceScore()
+                    "id", saved.getId(),
+                    "message", "Product uploaded successfully",
+                    "qualityGrade", saved.getQualityGrade(),
+                    "confidenceScore", saved.getConfidenceScore()
             ));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(Map.of("error", "Upload failed: " + e.getMessage()));
         }
     }
 
-
     @PreAuthorize("hasRole('FARMER')")
     @GetMapping("/products/my")
-    public ResponseEntity<?> getMyProducts(Principal principal) {
+    public ResponseEntity<?> getMyProducts(
+            Principal principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size,
+            @RequestParam(defaultValue = "id,desc") String sort) {
+
         if (principal == null) return ResponseEntity.status(401).body(Map.of("error", "Authentication required"));
 
         String email = principal.getName();
         User farmer = userRepository.findByEmail(email)
                 .orElseThrow(() -> new RuntimeException("Farmer not found"));
 
-        List<Product> products = productService.getProductsByFarmerId(farmer.getId());
-        return ResponseEntity.ok(products);
+        String[] parts = sort.split(",", 2);
+        String sortProp = parts[0];
+        boolean asc = parts.length > 1 && "asc".equalsIgnoreCase(parts[1]);
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                asc ? Sort.Direction.ASC : Sort.Direction.DESC,
+                sortProp
+        );
+
+        var pageRes = productRepository.findByFarmerId(farmer.getId(), pageable);
+        return ResponseEntity.ok(pageRes);
     }
 
     @PreAuthorize("hasAnyRole('FARMER','ADMIN')")
@@ -349,6 +367,4 @@ public class ProductController {
 
         return ResponseEntity.badRequest().body(Map.of("error", "Invalid action"));
     }
-    
-   
 }

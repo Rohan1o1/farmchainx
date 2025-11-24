@@ -1,9 +1,12 @@
 package com.farmchainx.farmchainx.repository;
 
 import com.farmchainx.farmchainx.model.Product;
+
+import org.springframework.data.domain.Page;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.springframework.data.domain.Pageable;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -15,6 +18,8 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
 
     Optional<Product> findByPublicUuid(String uuid);
 
+    Page<Product> findByFarmerId(Long farmerId, Pageable pageable);
+    
     @Query("SELECT p FROM Product p " +
            "WHERE (:cropName IS NULL OR p.cropName = :cropName) " +
            "AND (:endDate IS NULL OR p.harvestDate <= :endDate)")

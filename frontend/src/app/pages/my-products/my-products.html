@@ -1,5 +1,4 @@
-
-<div class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-12 px-6">
+<div class="min-h-screen bg-gradient-to-br from-green-50 via-emerald-50 to-teal-50 py-12 px-6 font-sans antialiased">
   <div class="max-w-7xl mx-auto">
 
     <!-- Title -->
@@ -12,31 +11,48 @@
       </p>
     </div>
 
+    <!-- Loading Overlay -->
+    <div *ngIf="loading" class="fixed inset-0 bg-white/80 backdrop-blur-md flex items-center justify-center z-50">
+      <div class="text-center">
+        <div class="animate-spin rounded-full h-20 w-20 border-t-8 border-b-8 border-green-600 mx-auto mb-6"></div>
+        <p class="text-2xl font-bold text-gray-700">Loading your products...</p>
+      </div>
+    </div>
+    <!-- Retry Banner -->
+<div *ngIf="retryMessage"
+     class="fixed top-0 left-0 w-full bg-yellow-100 text-yellow-800 text-center py-3 font-bold shadow-lg z-50 animate-pulse">
+  {{ retryMessage }}
+</div>
 
 
+    <!-- No Products -->
+    <div *ngIf="!loading && products.length === 0" class="text-center py-40">
+      <h2 class="text-5xl font-black text-gray-600 mb-6">No Products Yet</h2>
+      <p class="text-lg text-gray-500">Start uploading your first harvest to the blockchain!</p>
+    </div>
 
+    <!-- Product Grid -->
     <div *ngIf="products.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-12">
       <div *ngFor="let p of products"
            class="group bg-white rounded-3xl shadow-2xl overflow-hidden hover:shadow-3xl transition-all duration-500 transform hover:-translate-y-6">
 
-        <!-- Hero Section (like verify page) -->
+        <!-- Image Section -->
         <div class="relative h-80 bg-black">
           <img [src]="getImageUrl(p.imagePath)"
                [alt]="p.cropName"
                class="w-full h-full object-cover opacity-85 group-hover:opacity-100 transition">
-
           <div class="absolute inset-0 bg-gradient-to-t from-black via-black/50 to-transparent"></div>
 
-          <!-- Giant Emoji -->
+          <!-- Emoji Overlay -->
           <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div class="bg-white/98 backdrop-blur-lg rounded-full p-12 shadow-2xl border-8 border-white animate-pulse-slow">
+            <div class="bg-white/95 backdrop-blur-lg rounded-full p-12 shadow-2xl border-8 border-white animate-pulse-slow">
               <div class="text-9xl md:text-[200px] drop-shadow-2xl">
                 {{ getCropEmoji(p.cropName) }}
               </div>
             </div>
           </div>
 
-          <!-- Crop Name + Harvest Date -->
+          <!-- Crop Info -->
           <div class="absolute bottom-10 left-8 text-white">
             <h3 class="text-6xl md:text-8xl font-black drop-shadow-2xl leading-none">
               {{ p.cropName | titlecase }}
@@ -50,7 +66,7 @@
         <!-- Card Body -->
         <div class="p-10 space-y-8">
 
-          <!-- AI Quality Badge (BIG) -->
+          <!-- AI Quality Badge -->
           <div class="flex justify-center">
             <div class="bg-gradient-to-br from-emerald-500 to-teal-700 text-white px-16 py-10 rounded-3xl shadow-2xl border-4 border-white/60">
               <div class="text-8xl font-black">{{ p.qualityGrade || 'A+' }}</div>
@@ -60,7 +76,7 @@
             </div>
           </div>
 
-          <!-- Farmer Name & ID -->
+          <!-- Farmer Info -->
           <div class="text-center space-y-3">
             <p class="text-gray-600 text-lg uppercase tracking-wider font-bold">Registered By</p>
             <p class="text-2xl font-bold text-gray-800">{{ p.farmer?.name || 'Farmer' }}</p>
@@ -73,10 +89,10 @@
             <div class="flex justify-center items-center gap-3">
               <span *ngIf="p.qrCodePath"
                     class="text-green-600 font-black text-2xl flex items-center gap-3">
-                Ready for Printing
+                ✅ Ready for Printing
               </span>
               <span *ngIf="!p.qrCodePath" class="text-orange-600 font-black text-2xl">
-                Generate QR First
+                ⚠️ Generate QR First
               </span>
             </div>
           </div>
@@ -99,7 +115,7 @@
             </a>
           </div>
 
-          <!-- QR Preview (Large & Beautiful) -->
+          <!-- QR Preview -->
           <div *ngIf="p.qrCodePath" class="p-8 bg-gray-50 rounded-3xl border-4 border-dashed border-gray-300 text-center">
             <img [src]="getQrUrl(p.qrCodePath)" alt="QR Code" class="w-64 h-64 mx-auto rounded-2xl shadow-2xl">
             <p class="text-lg font-bold text-gray-700 mt-6">Scan to Verify on Blockchain</p>
@@ -107,5 +123,23 @@
         </div>
       </div>
     </div>
+
+    <!-- Pagination Controls -->
+    <div *ngIf="!loading && totalPages > 1" class="mt-16 flex justify-center items-center gap-6">
+      <button (click)="prevPage()" [disabled]="page === 0"
+        class="px-6 py-3 text-lg font-bold rounded-2xl bg-gray-800 text-white hover:bg-gray-900 disabled:opacity-40 transition">
+        ← Prev
+      </button>
+
+      <span class="text-2xl font-black text-gray-700">
+        Page {{ page + 1 }} / {{ totalPages }}
+      </span>
+
+      <button (click)="nextPage()" [disabled]="page >= totalPages - 1"
+        class="px-6 py-3 text-lg font-bold rounded-2xl bg-green-700 text-white hover:bg-green-800 disabled:opacity-40 transition">
+        Next →
+      </button>
+    </div>
+
   </div>
 </div>
