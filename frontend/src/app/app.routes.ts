@@ -32,7 +32,7 @@ export const routes: Routes = [
   {
     path: 'scanner',
     canActivate: [AuthGuard],
-    loadComponent: () => import('./components/qr-scanner/qr-scanner/qr-scanner').then(m => m.QrScannerComponent)
+    loadComponent: () => import('./components/qr-scanner/qr-scanner/qr-scanner').then(m => m.QrScanner)
   },
   {
     path: 'products/my',

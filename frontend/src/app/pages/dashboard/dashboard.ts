@@ -1,4 +1,4 @@
-import { Component, inject } from '@angular/core';
+import { Component, inject, AfterViewInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../services/auth.service';
@@ -10,15 +10,21 @@ import { AdminService } from '../../services/admin.service';
   selector: 'app-dashboard',
   templateUrl: './dashboard.html'
 })
-export class Dashboard {
+export class Dashboard implements AfterViewInit {
   private authService = inject(AuthService);
   private adminService = inject(AdminService);
   private router = inject(Router);
 
-  // These are now 100% safe — no initialization error
   name = this.authService.getName() || 'User';
-  role = (this.authService.getRole()?.replace('ROLE_', '') || 'USER');
+  role = this.authService.getRole()?.replace('ROLE_', '') || 'USER';
   isAdmin = this.authService.isAdmin();
+
+  ngAfterViewInit(): void {
+    const ringColor =
+      getComputedStyle(document.documentElement)
+        .getPropertyValue('--tw-ring-color') || '(not set)';
+    console.log('tw-ring-color:', ringColor);
+  }
 
   logout() {
     this.authService.logout();
@@ -28,7 +34,7 @@ export class Dashboard {
   requestAdminAccess() {
     this.adminService.requestAdminAccess().subscribe({
       next: () => alert('Admin access requested!'),
-      error: () => alert('Already requested or you are admin')
+      error: () => alert('Already requested or you are admin'),
     });
   }
 }

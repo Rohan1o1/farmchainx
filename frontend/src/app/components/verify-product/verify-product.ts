@@ -145,6 +145,7 @@ export class VerifyProduct implements OnInit {
     const myId = this.currentUserId != null ? Number(this.currentUserId) : null;
     const confirmed = typeof lastLog?.confirmed === 'boolean' ? lastLog.confirmed : false;
     const rejected = typeof lastLog?.rejected === 'boolean' ? lastLog.rejected : false;
+
     if (this.userRole === 'Distributor') {
       if (lastFrom == null && lastTo == null) return true;
       if (lastTo === myId) return !rejected;
@@ -158,10 +159,10 @@ export class VerifyProduct implements OnInit {
 
   currentActionText(): string {
     if (this.userRole === 'Distributor') {
-      if (!this.hasTakenFromFarmer() && this.showUpdatePossible()) return '1. Confirm Receipt from Farmer ✓';
-      return this.isFinalHandover ? 'FINAL: Hand Over to Retailer →' : '+ Add Tracking Update';
+      if (!this.hasTakenFromFarmer() && this.showUpdatePossible()) return '1. Confirm Receipt from Farmer';
+      return this.isFinalHandover ? 'FINAL: Hand Over to Retailer' : '+ Add Tracking Update';
     }
-    if (this.userRole === 'Retailer') return 'Confirm Receipt ✓';
+    if (this.userRole === 'Retailer') return 'Confirm Receipt';
     return '';
   }
 

@@ -1,5 +1,4 @@
-
-
+// src/app/components/qr-scanner/qr-scanner.ts
 import { Component } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
@@ -13,7 +12,7 @@ import { BarcodeFormat } from '@zxing/library';
   templateUrl: './qr-scanner.html',
   styleUrl: './qr-scanner.scss'
 })
-export class QrScannerComponent {
+export class QrScanner {  // ← No "Component" in class name
   formats = [BarcodeFormat.QR_CODE];
 
   isScanning = true;
@@ -21,10 +20,12 @@ export class QrScannerComponent {
   hasTorch = false;
   usingFileUpload = false;
   uploadedImageUrl: string | null = null;
+  scanResult: string | null = null;
 
   constructor(private router: Router) {}
 
   onScanSuccess(result: string) {
+    this.scanResult = result;
     this.isScanning = false;
     this.usingFileUpload = false;
 
@@ -37,22 +38,17 @@ export class QrScannerComponent {
     }
   }
 
-  onScanError(err: any) {
-    console.error('Scan error:', err);
-  }
-
+  onScanError(err: any) { console.error(err); }
   onPermission(granted: boolean) {
     if (!granted) {
       alert('Camera access denied. Using photo upload instead.');
       this.usingFileUpload = true;
     }
   }
-
   onCamerasFound(devices: MediaDeviceInfo[]) {
     this.hasTorch = devices.some(d => !!(d as any).getCapabilities?.()?.torch);
   }
 
-  // File Upload Fallback
   onFileSelected(event: Event) {
     const input = event.target as HTMLInputElement;
     if (!input.files?.length) return;
@@ -69,18 +65,16 @@ export class QrScannerComponent {
         const codeReader = new zxing.BrowserQRCodeReader();
         const img = new Image();
         img.src = e.target.result;
-
         img.onload = () => {
           codeReader.decodeFromImageElement(img)
-            .then(result => this.onScanSuccess(result.getText()))
+            .then(r => this.onScanSuccess(r.getText()))
             .catch(() => {
-              alert('No QR code found in image. Try again with a clearer photo.');
+              alert('No QR code found');
               this.restart();
             });
         };
       });
     };
-
     reader.readAsDataURL(file);
   }
 
@@ -89,5 +83,8 @@ export class QrScannerComponent {
     this.usingFileUpload = false;
     this.uploadedImageUrl = null;
     this.torchEnabled = false;
+    this.scanResult = null;
   }
 }
+
+export default QrScanner;
