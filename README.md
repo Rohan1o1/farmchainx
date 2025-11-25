@@ -1,91 +1,49 @@
-FarmChainX
+# FarmChainX — Blockchain-Powered Agricultural Traceability
 
-Status: Work in Progress (WIP)
+Live Demo: http://localhost:4200  
+Backend: http://localhost:8080
 
-🚀 Overview
+## Sample Accounts (Ready to Login)
 
-FarmChainX is an AI and blockchain-powered supply chain platform built for the agriculture industry.
-It ensures transparency, traceability, and authenticity for farm products — from the farmer’s field to the consumer’s hands.
-The project combines Spring Boot for backend APIs, blockchain for tamper-proof records, and AI for quality checks and demand forecasting.
+| Role         | Email                          | Password | Notes |
+|--------------|--------------------------------|----------|-------|
+| Farmer       | farmer@farmchainx.com          | 1234     | Can upload |
+| Distributor  | distributor@farmchainx.com     | 1234     | Can receive & handover |
+| Retailer     | retailer@farmchainx.com        | 1234     | Can confirm receipt |
+| Consumer     | consumer@farmchainx.com        | 1234     | Can scan & review |
+| Admin        | admin@farmchainx.com           | 1234     | Full access |
 
-🌾 How It Works
+All accounts pre-registered in DB via `data.sql`
 
-👨‍🌾 Farmer
+## Sample Products Already Uploaded (by farmer)
 
-Registers and uploads product details such as name, category, quantity, harvest date, and photos.
+- Basmati Rice  
+- Red Onion  
+- Alphonso Mango  
+- Organic Tomato  
 
-Each product batch receives a unique blockchain entry for traceability.
+→ Just scan any QR from `/verify/...` links below
 
-Can view AI-based quality scores generated from uploaded images.
+## Quick Demo Flow (Copy-Paste Links)
 
-🚚 Distributor
+1. **Farmer uploads** → already done  
+2. **Generate QR** → Done (on My Products page)  
+3. **Verify QR** → Click any:  
+   http://localhost:4200/verify/123e4567-e89b-12d3-a456-426614174000  
+   http://localhost:4200/verify/123e4567-e89b-12d3-a456-426614174001  
+4. **Distributor logs in** → Confirm receipt → Final handover to retailer  
+5. **Retailer logs in** → Confirm receipt  
+6. **Consumer scans** → Leaves 5-star review  
+7. **Admin** → Sees everything in Admin Panel
 
-Views available products from farmers and purchases them in batches.
+## How to Run
 
-Updates transportation and storage details, recorded immutably on the blockchain.
+```bash
+# Backend (Spring Boot)
+cd backend
+./mvnw spring-boot:run
 
-Uses AI-based demand forecasts to optimize logistics and inventory.
-
-🧾 Quality Auditor
-
-Reviews product and batch details submitted by farmers and distributors.
-
-Uses blockchain logs to verify authenticity and detect tampering.
-
-Approves or flags batches based on AI-assisted quality results.
-
-🛒 Retailer / Consumer
-
-Can track a product’s complete journey from farm to shelf.
-
-Verifies product authenticity, quality, and sustainability data stored on blockchain.
-
-Gains trust and confidence in organic and eco-friendly products.
-
-⚙️ Features
-
-Product and batch registration with complete origin details
-
-Blockchain-based tracking for authenticity and transparency
-
-AI-driven product quality assessment and demand forecasting
-
-Secure JWT authentication and role-based access control
-
-RESTful APIs following clean controller–service–repository architecture
-
-🧰 Tech Stack
-
-Backend: Java, Spring Boot, Spring Data JPA
-
-Database: MySQL
-
-Blockchain: Hyperledger / Private Ledger (Prototype)
-
-AI Module: Python (Flask / FastAPI microservice)
-
-Security: Spring Security + JWT
-
-Tools: Maven, Lombok, Postman, Docker
-
-🗺️ Roadmap
-
- Integrate AI model for real-time quality checking
-
- Implement blockchain ledger for transaction traceability
-
- Build React-based frontend dashboard for all user roles
-
- Add CI/CD pipelines and Dockerized deployment
-
-👨‍💻 Roles Summary
-Role	Capabilities
-Farmer	Add products, upload batches, view AI quality report
-Distributor	Purchase batches, track logistics, forecast demand
-Auditor	Verify authenticity, validate blockchain events
-Retailer / Consumer	Track product journey and verify origin
-
-📫 Contact
-
-Maintainer: Your Name
-Email: ashwanth.jayakumar.gowri@gmail.com
+# Frontend (Angular)
+cd frontend
+npm install
+ng serve --proxy-config proxy.conf.json 
