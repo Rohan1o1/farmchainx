@@ -4,19 +4,20 @@ import { HttpClient } from '@angular/common/http';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
+type Mode = 'update' | 'handover' | null;
+
 @Component({
   selector: 'app-verify-product',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './verify-product.html',
-  styleUrl: './verify-product.scss'
+  styleUrls: ['./verify-product.scss']
 })
 export class VerifyProduct implements OnInit {
   product: any = null;
   loading = true;
   error = '';
   uuid = '';
-  canUpdate = false;
   showAddForm = false;
   newNote = '';
   newLocation = '';
@@ -24,8 +25,7 @@ export class VerifyProduct implements OnInit {
   selectedRetailerId: number | null = null;
   currentUserId: number | null = null;
   displayLocation = '';
-  resolvingLocation = false;
-  isFinalHandover = false;
+  mode: Mode = null;
 
   userRole: 'Guest' | 'Farmer' | 'Distributor' | 'Retailer' | 'Admin' | 'Consumer' = 'Guest';
 
@@ -43,8 +43,8 @@ export class VerifyProduct implements OnInit {
   }
 
   private readRoleFromToken() {
-    const token = localStorage.getItem('fcx_token') || localStorage.getItem('token') || localStorage.getItem('jwt') || null;
-    const storedRole = localStorage.getItem('fcx_role') || localStorage.getItem('role') || null;
+    const token = localStorage.getItem('fcx_token') || localStorage.getItem('token') || localStorage.getItem('jwt');
+    const storedRole = localStorage.getItem('fcx_role') || localStorage.getItem('role');
 
     if (storedRole) {
       const rn = storedRole.toUpperCase().replace(/^ROLE_/, '');
@@ -62,21 +62,24 @@ export class VerifyProduct implements OnInit {
       const parts = token.split('.');
       if (parts.length < 2) return;
       const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
-
       this.currentUserId = payload.userId || payload.id || payload.sub || payload.user?.id || null;
       if (this.userRole === 'Distributor') this.loadRetailers();
-    } catch (e) {}
+    } catch {}
   }
 
   private loadProduct() {
     this.loading = true;
     this.http.get(`/api/verify/${this.uuid}`).subscribe({
       next: (data: any) => {
+        if (Array.isArray(data?.trackingHistory)) {
+          data.trackingHistory = [...data.trackingHistory].sort(
+            (a: any, b: any) => new Date(a.timestamp).getTime() - new Date(b.timestamp).getTime()
+          );
+        }
         this.product = data;
-        this.canUpdate = (data && data.canUpdate === true) || (this.userRole === 'Distributor' || this.userRole === 'Retailer');
-        this.consumerCanGiveFeedback = data.canGiveFeedback === true;
+        this.displayLocation = data.displayLocation || data.gpsLocation || 'Protected Location';
+        this.consumerCanGiveFeedback = (this.userRole === 'Consumer') && (data.canGiveFeedback === true);
         this.loading = false;
-        this.displayLocation = data.displayLocation || data.gpsLocation || '';
         this.loadFeedbacks();
       },
       error: () => {
@@ -88,28 +91,160 @@ export class VerifyProduct implements OnInit {
 
   private loadRetailers() {
     this.http.get<any[]>('/api/track/users/retailers').subscribe({
-      next: (data) => (this.retailers = data)
+      next: (data) => {
+        this.retailers = data;
+      }
     });
   }
 
   private loadFeedbacks() {
     if (!this.product?.productId) return;
     this.http.get<any[]>(`/api/products/${this.product.productId}/feedbacks`).subscribe({
-      next: (list) => (this.feedbacks = list || []),
-      error: () => {}
+      next: (list) => {
+        this.feedbacks = list || [];
+      }
+    });
+  }
+
+  private latestLog() {
+    return this.product?.trackingHistory?.length
+      ? this.product.trackingHistory[this.product.trackingHistory.length - 1]
+      : null;
+  }
+
+  private myIdNum(): number | null {
+    return this.currentUserId != null ? Number(this.currentUserId) : null;
+  }
+
+  private isCurrentOwner(): boolean {
+    const myId = this.myIdNum();
+    const last = this.latestLog();
+    if (!myId || !last) return false;
+    const to = last.toUserId != null ? Number(last.toUserId) : null;
+    return to === myId && last.confirmed === true;
+  }
+
+  private isUnclaimed(): boolean {
+    const last = this.latestLog();
+    if (!last) return true;
+    const from = last.fromUserId != null ? Number(last.fromUserId) : null;
+    const to = last.toUserId != null ? Number(last.toUserId) : null;
+    const confirmed = last.confirmed === true;
+    return from === null && to === null && confirmed === false;
+  }
+
+  hasDistributorTakenPossession(): boolean {
+    if (this.userRole !== 'Distributor') return false;
+    return this.isCurrentOwner();
+  }
+
+  showUpdatePossible(): boolean {
+    const myId = this.myIdNum();
+    const last = this.latestLog();
+
+    if (this.userRole === 'Distributor') {
+      if (!last) return true;
+      const to = last.toUserId != null ? Number(last.toUserId) : null;
+      const from = last.fromUserId != null ? Number(last.fromUserId) : null;
+      const confirmed = last.confirmed === true;
+
+      const unclaimed = from === null && to === null && confirmed === false;
+      if (unclaimed) return true;
+
+      const isOwnerNow = to === myId && confirmed;
+      const handedToRetailer = to !== null && to !== myId;
+      return isOwnerNow && !handedToRetailer;
+    }
+
+    if (this.userRole === 'Retailer') {
+      if (!last || !myId) return false;
+      const to = last.toUserId != null ? Number(last.toUserId) : null;
+      const from = last.fromUserId != null ? Number(last.fromUserId) : null;
+      return to === myId && from !== null && last.confirmed !== true;
+    }
+
+    return false;
+  }
+
+  openForm(which: Mode) {
+    if (!this.showUpdatePossible()) return;
+    this.mode = which;
+    this.showAddForm = true;
+    if (which === 'handover' && this.userRole === 'Distributor' && this.retailers.length === 0) {
+      this.loadRetailers();
+    }
+  }
+
+  cancelForm() {
+    this.showAddForm = false;
+    this.mode = null;
+    this.newLocation = '';
+    this.newNote = '';
+    this.selectedRetailerId = null;
+  }
+
+  submitChainUpdate() {
+    if (!this.showUpdatePossible()) {
+      alert('Action not allowed');
+      return;
+    }
+    if (!this.newLocation.trim()) {
+      alert('Location is required');
+      return;
+    }
+    if (this.mode === 'handover' && !this.selectedRetailerId) {
+      alert('Please select a retailer');
+      return;
+    }
+
+    const payload: any = {
+      productId: this.product.productId,
+      location: this.newLocation.trim(),
+      notes: this.newNote.trim() || undefined
+    };
+
+    if (this.mode === 'handover') {
+      payload.toUserId = this.selectedRetailerId;
+    }
+
+    this.http.post('/api/track/update-chain', payload).subscribe({
+      next: (res: any) => {
+        alert(res?.message || 'Success!');
+        this.cancelForm();
+        this.loadProduct();
+      },
+      error: (err) => {
+        alert(err.error?.error || 'Failed');
+      }
+    });
+  }
+
+  firstClaimNow() {
+    if (this.userRole !== 'Distributor') { alert('Only distributor can claim first.'); return; }
+    if (!this.isUnclaimed()) { alert('Not in unclaimed state.'); return; }
+    const payload = {
+      productId: this.product.productId,
+      location: this.newLocation.trim() || 'Distributor received from farmer',
+      notes: this.newNote.trim() || 'Distributor received from farmer'
+    };
+    this.http.post('/api/track/update-chain', payload).subscribe({
+      next: (res: any) => {
+        alert(res?.message || 'You have taken possession from farmer');
+        this.cancelForm();
+        this.loadProduct();
+      },
+      error: (err) => {
+        alert(err?.error?.error || 'Failed');
+      }
     });
   }
 
   submitFeedback() {
-    if (!this.product?.productId) {
-      alert('Product not loaded');
-      return;
-    }
-    const rating = Number(this.myRating);
-    if (!rating || rating < 1 || rating > 5) {
-      alert('Rating must be between 1 and 5');
-      return;
-    }
+    if (this.userRole !== 'Consumer') { alert('Only consumers can submit feedback.'); return; }
+    if (!this.product?.productId) { alert('Product not loaded'); return; }
+    if (!this.consumerCanGiveFeedback) { alert('You have already submitted feedback for this product.'); return; }
+    const rating = Number(this.myRating || 0);
+    if (!rating || rating < 1 || rating > 5) { alert('Rating must be 1–5'); return; }
     const payload = { rating, comment: (this.myComment || '').trim() };
     this.http.post(`/api/products/${this.product.productId}/feedback`, payload).subscribe({
       next: () => {
@@ -120,81 +255,9 @@ export class VerifyProduct implements OnInit {
         this.loadFeedbacks();
       },
       error: (err) => {
-        alert(err.error?.error || 'Failed to submit feedback');
+        alert(err?.error?.error || 'Failed');
       }
     });
-  }
-
-  hasTakenFromFarmer(): boolean {
-    if (!this.product?.trackingHistory?.length || !this.currentUserId) return false;
-    const lastLog = this.product.trackingHistory[this.product.trackingHistory.length - 1];
-    const lastTo = lastLog?.toUserId != null ? Number(lastLog.toUserId) : null;
-    const myId = this.currentUserId != null ? Number(this.currentUserId) : null;
-    const confirmed = typeof lastLog?.confirmed === 'boolean' ? lastLog.confirmed : false;
-    return lastTo === myId && confirmed === true;
-  }
-
-  showUpdatePossible(): boolean {
-    if (!this.canUpdate) return false;
-    if (!this.product?.trackingHistory || this.product.trackingHistory.length === 0) {
-      return this.userRole === 'Distributor';
-    }
-    const lastLog = this.product.trackingHistory[this.product.trackingHistory.length - 1];
-    const lastFrom = lastLog?.fromUserId != null ? Number(lastLog.fromUserId) : null;
-    const lastTo = lastLog?.toUserId != null ? Number(lastLog.toUserId) : null;
-    const myId = this.currentUserId != null ? Number(this.currentUserId) : null;
-    const confirmed = typeof lastLog?.confirmed === 'boolean' ? lastLog.confirmed : false;
-    const rejected = typeof lastLog?.rejected === 'boolean' ? lastLog.rejected : false;
-
-    if (this.userRole === 'Distributor') {
-      if (lastFrom == null && lastTo == null) return true;
-      if (lastTo === myId) return !rejected;
-      return false;
-    }
-    if (this.userRole === 'Retailer') {
-      return lastTo === myId && confirmed === false && rejected === false;
-    }
-    return false;
-  }
-
-  currentActionText(): string {
-    if (this.userRole === 'Distributor') {
-      if (!this.hasTakenFromFarmer() && this.showUpdatePossible()) return '1. Confirm Receipt from Farmer';
-      return this.isFinalHandover ? 'FINAL: Hand Over to Retailer' : '+ Add Tracking Update';
-    }
-    if (this.userRole === 'Retailer') return 'Confirm Receipt';
-    return '';
-  }
-
-  submitChainUpdate() {
-    if (!this.newLocation.trim()) {
-      alert('Location is required');
-      return;
-    }
-    const payload: any = { location: this.newLocation.trim(), note: this.newNote.trim() || undefined };
-    if (this.isFinalHandover) {
-      if (!this.selectedRetailerId) {
-        alert('Please select a retailer');
-        return;
-      }
-      payload.toUserId = this.selectedRetailerId;
-    }
-    this.http.post(`/api/verify/${this.uuid}/track`, payload).subscribe({
-      next: () => {
-        alert('Success!');
-        this.resetForm();
-        this.loadProduct();
-      },
-      error: (err) => alert(err.error?.error || 'Failed')
-    });
-  }
-
-  resetForm() {
-    this.newLocation = '';
-    this.newNote = '';
-    this.selectedRetailerId = null;
-    this.showAddForm = false;
-    this.isFinalHandover = false;
   }
 
   getCropEmoji(): string {
@@ -211,5 +274,21 @@ export class VerifyProduct implements OnInit {
 
   getImageUrl(path: string): string {
     return path?.startsWith('http') ? path : `http://localhost:8080${path}`;
+  }
+
+  actorFromLog(log: any): string {
+    const createdBy = (log?.createdBy || '').trim();
+    if (createdBy) return createdBy;
+
+    const from = log?.fromUserId ?? null;
+    const to = log?.toUserId ?? null;
+    const confirmed = !!log?.confirmed;
+
+    if (from === null && to !== null && confirmed) return 'Distributor';
+    if (from !== null && to !== null && from === to && confirmed) return 'Distributor';
+    if (from !== null && to !== null && from !== to && confirmed) return 'Retailer';
+    if (from === null && to === null && !confirmed) return 'Farmer';
+
+    return 'Farmer';
   }
 }

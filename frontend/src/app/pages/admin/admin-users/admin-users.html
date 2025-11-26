@@ -20,9 +20,8 @@
           <td class="px-10 py-6 text-indigo-400">{{ user.email }}</td>
           <td class="px-10 py-6">
             <span class="px-4 py-2 rounded-full text-xs font-bold"
-                  [class.bg-purple-500/30]="user.isAdmin"
-                  [class.bg-gray-500/30]="!user.isAdmin">
-              {{ user.isAdmin ? 'ADMIN' : 'USER' }}
+                  [ngClass]="roleClass(user.primaryRole)">
+              {{ user.primaryRole }}
             </span>
           </td>
           <td class="px-10 py-6">
