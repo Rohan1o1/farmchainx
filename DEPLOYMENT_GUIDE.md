@@ -1,15 +1,15 @@
 # 🚀 FarmChainX Deployment Guide
 
-Complete deployment guide for FarmChainX with Frontend on Vercel and Backend on Render.
+Complete deployment guide for FarmChainX with Frontend on Netlify and Backend on Render.
 
 ## 📋 Prerequisites
 
 - GitHub account
-- Vercel account (free tier available)
+- Netlify account (free tier available)
 - Render account (free tier available)  
 - Cloudinary account (for image storage)
 
-## 🌐 Frontend Deployment (Vercel)
+## 🌐 Frontend Deployment (Netlify)
 
 ### Step 1: Prepare Frontend for Production
 
@@ -30,31 +30,40 @@ Complete deployment guide for FarmChainX with Frontend on Vercel and Backend on 
    http-server dist/farmchainx-frontend -p 4200
    ```
 
-### Step 2: Deploy to Vercel
+### Step 2: Deploy to Netlify
 
-1. **Connect to Vercel**
-   - Go to [vercel.com](https://vercel.com)
+1. **Connect to Netlify**
+   - Go to [netlify.com](https://netlify.com)
    - Sign up/Sign in with GitHub
-   - Click "New Project"
-   - Import your `farmchainx` repository
+   - Click "New site from Git"
+   - Choose GitHub and authorize Netlify
+   - Select your `farmchainx` repository
 
 2. **Configure Build Settings**
-   - **Framework Preset**: Angular
-   - **Root Directory**: `frontend`
-   - **Build Command**: `npm run build:prod`
-   - **Output Directory**: `dist`
-   - **Install Command**: `npm install`
+   - **Base directory**: `frontend`
+   - **Build command**: `npm run build:prod`
+   - **Publish directory**: `dist/farmchainx`
+   - **Environment**: Node.js 18.x
 
-3. **Environment Variables**
-   Add these in Vercel dashboard:
+3. **Advanced Build Settings**
+   Netlify will automatically use `netlify.toml` for configuration including:
+   - SPA redirects for Angular routing
+   - Security headers
+   - Caching rules
+   - Environment variables
+
+4. **Environment Variables**
+   Add these in Netlify Site Settings → Environment Variables:
    ```
    NODE_ENV=production
+   ANGULAR_ENV=production
    ```
 
-4. **Deploy**
-   - Click "Deploy"
+5. **Deploy**
+   - Click "Deploy site"
    - Wait for build to complete
-   - Note your Vercel URL (e.g., `https://farmchainx.vercel.app`)
+   - Note your Netlify URL (e.g., `https://amazing-site-name.netlify.app`)
+   - Optionally set up custom domain in Site Settings
 
 ## 🖥️ Backend Deployment (Render)
 
@@ -101,7 +110,7 @@ Complete deployment guide for FarmChainX with Frontend on Vercel and Backend on 
    CLOUDINARY_CLOUD_NAME=your_cloudinary_cloud_name
    CLOUDINARY_API_KEY=your_cloudinary_api_key  
    CLOUDINARY_API_SECRET=your_cloudinary_api_secret
-   FRONTEND_URL=https://your-vercel-app.vercel.app
+   FRONTEND_URL=https://your-netlify-site.netlify.app
    ```
 
 ### Step 3: Setup Database
@@ -154,11 +163,11 @@ Complete deployment guide for FarmChainX with Frontend on Vercel and Backend on 
 1. **Update Production Properties**
    In `application-production.properties`:
    ```properties
-   frontend.url=https://your-vercel-app.vercel.app
+   frontend.url=https://your-netlify-site.netlify.app
    ```
 
 2. **Redeploy Both Services**
-   - Redeploy Vercel app
+   - Trigger new build on Netlify (push to GitHub)
    - Redeploy Render service
 
 ## 🛡️ Security Configuration
@@ -177,16 +186,16 @@ Complete deployment guide for FarmChainX with Frontend on Vercel and Backend on 
 
 Update your Spring Boot CORS configuration:
 ```java
-@CrossOrigin(origins = {"https://your-vercel-app.vercel.app"})
+@CrossOrigin(origins = {"https://your-netlify-site.netlify.app"})
 ```
 
 ## 🧪 Testing Deployment
 
 ### Step 1: Test Frontend
 
-1. **Access Vercel URL**
+1. **Access Netlify URL**
    ```
-   https://your-vercel-app.vercel.app
+   https://your-netlify-site.netlify.app
    ```
 
 2. **Check Console**
@@ -221,7 +230,7 @@ Update your Spring Boot CORS configuration:
 
 1. **Build Failures**
    ```bash
-   # Check logs in Render/Vercel dashboard
+   # Check logs in Render/Netlify dashboard
    # Verify dependencies in package.json/pom.xml
    ```
 
@@ -248,7 +257,7 @@ Update your Spring Boot CORS configuration:
 
 ## 📊 Performance Optimization
 
-### Frontend (Vercel)
+### Frontend (Netlify)
 
 1. **Build Optimization**
    ```json
@@ -266,6 +275,7 @@ Update your Spring Boot CORS configuration:
 2. **Lazy Loading**
    - Implement lazy loading for routes
    - Split bundles for better performance
+   - Netlify provides automatic CDN optimization
 
 ### Backend (Render)
 
@@ -284,15 +294,15 @@ Update your Spring Boot CORS configuration:
 
 After successful deployment:
 
-- **Frontend**: `https://your-app-name.vercel.app`
+- **Frontend**: `https://your-app-name.netlify.app`
 - **Backend**: `https://your-service-name.onrender.com`
 - **Database**: Managed by Render PostgreSQL
 
 ## 📈 Monitoring
 
-1. **Vercel Analytics**
-   - Enable analytics in Vercel dashboard
-   - Monitor page load times
+1. **Netlify Analytics**
+   - Enable analytics in Netlify dashboard
+   - Monitor page load times and visitor data
 
 2. **Render Metrics**
    - Monitor CPU and memory usage
@@ -306,10 +316,12 @@ After successful deployment:
 
 ### Free Tier Limits
 
-**Vercel (Free)**
+**Netlify (Free)**
+- 300 build minutes per month
 - 100GB bandwidth per month
-- Unlimited personal projects
+- Unlimited personal sites
 - Custom domains
+- Forms (100 submissions/month)
 
 **Render (Free)**
 - 750 hours per month
@@ -317,7 +329,7 @@ After successful deployment:
 - Sleeps after 15 minutes of inactivity
 
 ### Paid Plans
-- **Vercel Pro**: $20/month per user
+- **Netlify Pro**: $19/month per member
 - **Render Starter**: $7/month per service
 
 ---

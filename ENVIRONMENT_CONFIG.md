@@ -19,9 +19,10 @@ FRONTEND_URL=http://localhost:4200
 
 ## Production Environment Variables
 
-### Vercel (Frontend)
+### Netlify (Frontend)
 ```env
 NODE_ENV=production
+ANGULAR_ENV=production
 ```
 
 ### Render (Backend)
@@ -41,7 +42,7 @@ CLOUDINARY_API_KEY=your_cloudinary_api_key
 CLOUDINARY_API_SECRET=your_cloudinary_api_secret
 
 # CORS Configuration
-FRONTEND_URL=https://your-vercel-app.vercel.app
+FRONTEND_URL=https://your-netlify-site.netlify.app
 ```
 
 ## 🔑 How to Get Required Credentials
@@ -62,7 +63,7 @@ FRONTEND_URL=https://your-vercel-app.vercel.app
 4. Auto-populate DATABASE_URL, DB_USERNAME, DB_PASSWORD
 
 ### 3. Domain Configuration
-1. After Vercel deployment, copy your app URL
+1. After Netlify deployment, copy your app URL
 2. Update FRONTEND_URL in Render backend
 3. Update apiUrl in Angular environment files
 
@@ -92,7 +93,7 @@ cp src/main/resources/application.properties.template src/main/resources/applica
 - [ ] No hardcoded credentials in source code
 
 ### After Deployment
-- [ ] Vercel environment variables set
+- [ ] Netlify environment variables set
 - [ ] Render environment variables set  
 - [ ] Database connection working
 - [ ] CORS configured properly

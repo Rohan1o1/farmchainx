@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# Frontend Deployment Script for Vercel
-echo "🚀 Preparing FarmChainX Frontend for Vercel Deployment"
+# Frontend Deployment Script for Netlify
+echo "🚀 Preparing FarmChainX Frontend for Netlify Deployment"
 
 # Navigate to frontend directory
 cd frontend
@@ -16,13 +16,13 @@ npm run build:prod
 
 # Check if build was successful
 if [ $? -eq 0 ]; then
-    echo "✅ Build successful! Ready for Vercel deployment."
+    echo "✅ Build successful! Ready for Netlify deployment."
     echo ""
     echo "Next steps:"
     echo "1. Push code to GitHub"
-    echo "2. Connect repository to Vercel"
+    echo "2. Connect repository to Netlify"
     echo "3. Set build command: npm run build:prod"
-    echo "4. Set output directory: dist"
+    echo "4. Set publish directory: dist/farmchainx"
     echo "5. Deploy!"
 else
     echo "❌ Build failed! Please check the errors above."
