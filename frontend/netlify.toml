@@ -1,8 +1,9 @@
 # Netlify configuration for FarmChainX Angular Frontend
 # This file configures the build settings and deployment options for Netlify
+# Updated to use npx for Angular CLI
 
 [build]
-  # Build command to run
+  # Build command to run with npx
   command = "npm install && npx ng build --configuration production"
   
   # Directory to publish (Angular dist folder)

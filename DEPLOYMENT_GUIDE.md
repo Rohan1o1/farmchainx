@@ -41,8 +41,8 @@ Complete deployment guide for FarmChainX with Frontend on Netlify and Backend on
 
 2. **Configure Build Settings**
    - **Base directory**: `frontend`
-   - **Build command**: `npm run build:prod`
-   - **Publish directory**: `dist/farmchainx`
+   - **Build command**: `npm install && npx ng build --configuration production`
+   - **Publish directory**: `dist/farmchainx-frontend`
    - **Environment**: Node.js 18.x
 
 3. **Advanced Build Settings**
