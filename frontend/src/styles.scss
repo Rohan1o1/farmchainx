@@ -1,7 +1,20 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&family=Outfit:wght@300;400;500;600;700;800;900&display=swap');
 
-:root { --app-bg: #f8fafc; }
-html.dark { --app-bg: #0f172a; }
+:root { 
+  --app-bg: #f8fafc;
+  --primary-gradient: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  --secondary-gradient: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+  --accent-gradient: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+  --modern-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  --modern-glow: 0 0 50px rgba(16, 185, 129, 0.3);
+  --glass-bg: rgba(255, 255, 255, 0.08);
+  --glass-border: rgba(255, 255, 255, 0.12);
+}
+
+html.dark { 
+  --app-bg: #0f172a;
+}
 
 html, body {
   margin: 0;
@@ -10,11 +23,15 @@ html, body {
   min-height: 100dvh;
   overflow-x: hidden;
   background-color: transparent !important;
+  font-family: 'Inter', 'Outfit', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  font-feature-settings: 'cv02', 'cv03', 'cv04', 'cv11';
+  scroll-behavior: smooth;
 }
 
 body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
 }
 
 app-root {
@@ -28,21 +45,1028 @@ app-root button {
   cursor: pointer;
 }
 
+/* Modern Animations with GPU acceleration */
 @keyframes blob {
-  0%, 100% { transform: translate(0px, 0px) scale(1); }
-  33%      { transform: translate(30px, -50px) scale(1.1); }
-  66%      { transform: translate(-20px, 40px) scale(0.9); }
+  0%, 100% { transform: translate3d(0px, 0px, 0) scale3d(1, 1, 1); }
+  33%      { transform: translate3d(30px, -50px, 0) scale3d(1.2, 1.1, 1); }
+  66%      { transform: translate3d(-20px, 40px, 0) scale3d(0.8, 0.9, 1); }
 }
-.animate-blob { animation: blob 20s infinite; }
-.animation-delay-2000 { animation-delay: 2s; }
-.animation-delay-4000 { animation-delay: 4s; }
 
-::-webkit-scrollbar { width: 10px; }
-::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb {
-  background: rgba(255,255,255,0.25);
-  border-radius: 6px;
-  border: 2px solid transparent;
-  background-clip: content-box;
+@keyframes float {
+  0%, 100% { transform: translate3d(0, 0px, 0) rotate(0deg); }
+  50%      { transform: translate3d(0, -30px, 0) rotate(8deg); }
 }
-::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.4); background-clip: content-box; }
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(16, 185, 129, 0.3), 0 0 40px rgba(16, 185, 129, 0.1); }
+  50% { box-shadow: 0 0 30px rgba(16, 185, 129, 0.5), 0 0 60px rgba(16, 185, 129, 0.2); }
+}
+
+@keyframes gradient-shift {
+  0%, 100% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+}
+
+@keyframes smooth-bounce {
+  0%, 100% { transform: translateY(0px) scale(1); }
+  50% { transform: translateY(-10px) scale(1.05); }
+}
+
+.animate-blob { animation: blob 25s infinite ease-in-out; }
+.animate-float { animation: float 8s ease-in-out infinite; }
+.animate-shimmer { animation: shimmer 3s infinite linear; }
+.animate-pulse-glow { animation: pulse-glow 3s ease-in-out infinite; }
+.animate-gradient-shift { animation: gradient-shift 6s ease infinite; }
+.animate-smooth-bounce { animation: smooth-bounce 2s ease-in-out infinite; }
+
+.animation-delay-1000 { animation-delay: 1s; }
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-3000 { animation-delay: 3s; }
+.animation-delay-4000 { animation-delay: 4s; }
+.animation-delay-6000 { animation-delay: 6s; }
+
+/* Custom scrollbar with enhanced styling */
+::-webkit-scrollbar { width: 12px; }
+::-webkit-scrollbar-track { 
+  background: rgba(15, 23, 42, 0.3);
+  border-radius: 10px;
+}
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.6), rgba(5, 150, 105, 0.8));
+  border-radius: 10px;
+  border: 2px solid transparent;
+  background-clip: padding-box;
+  box-shadow: inset 0 0 6px rgba(0,0,0,0.3);
+}
+::-webkit-scrollbar-thumb:hover { 
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.8), rgba(5, 150, 105, 1));
+}
+
+/* Modern Glass Morphism with enhanced depth */
+.glass-morphism {
+  background: var(--glass-bg);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 
+    var(--modern-shadow),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+/* Enhanced Login Form Styles for Better Visibility and Interaction */
+.login-form-card {
+  background: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 2px solid rgba(16, 185, 129, 0.2);
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    0 0 0 1px rgba(16, 185, 129, 0.1);
+  position: relative;
+  pointer-events: auto;
+  z-index: 20;
+}
+
+.login-form-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(34, 197, 94, 0.05) 50%, rgba(5, 150, 105, 0.08) 100%);
+  border-radius: inherit;
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Force input interactivity and override any blocking styles */
+.login-input {
+  background: rgba(255, 255, 255, 0.98) !important;
+  color: #111827 !important; /* Darker text for better visibility */
+  font-weight: 700 !important; /* Bolder text */
+  border: 2px solid rgba(16, 185, 129, 0.3) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: text !important;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 30 !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  touch-action: manipulation !important;
+  /* Text visibility enhancement */
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.2) !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.5px !important;
+}
+
+.login-input::placeholder {
+  color: #6b7280 !important;
+  opacity: 0.7 !important; /* Slightly more visible placeholder */
+  font-weight: 500;
+  user-select: none !important;
+  font-style: italic !important;
+}
+
+.login-input:focus {
+  background: rgba(255, 255, 255, 1) !important;
+  color: #000000 !important; /* Pure black text when focused */
+  border-color: #10b981 !important;
+  box-shadow: 
+    0 0 0 3px rgba(16, 185, 129, 0.15),
+    0 4px 12px rgba(16, 185, 129, 0.25) !important;
+  transform: translateY(-1px);
+  outline: none !important;
+  z-index: 40 !important;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.3) !important;
+}
+
+.login-input:hover {
+  background: rgba(255, 255, 255, 0.99) !important;
+  color: #111827 !important; /* Ensure dark text on hover */
+  border-color: rgba(16, 185, 129, 0.4) !important;
+}
+
+.login-input:active {
+  background: rgba(255, 255, 255, 1) !important;
+  color: #000000 !important; /* Pure black text when active */
+  border-color: #10b981 !important;
+}
+
+/* ====== LOGIN FORM STYLING ====== */
+.login-input {
+  background: rgba(255, 255, 255, 0.95) !important;
+  color: #111827 !important; /* Dark gray text - always visible */
+  font-weight: 700 !important; /* Bolder text */
+  border: 2px solid rgba(16, 185, 129, 0.3) !important;
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  cursor: text !important;
+  pointer-events: auto !important;
+  position: relative;
+  z-index: 30 !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  touch-action: manipulation !important;
+  /* Text visibility enhancement */
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.2) !important;
+  line-height: 1.5 !important;
+  letter-spacing: 0.5px !important;
+  /* Prevent webkit from changing text color */
+  -webkit-text-fill-color: #111827 !important;
+  -webkit-opacity: 1 !important;
+  opacity: 1 !important;
+}
+
+.login-input::placeholder {
+  color: #6b7280 !important;
+  opacity: 0.7 !important; /* Slightly more visible placeholder */
+  font-weight: 500;
+  user-select: none !important;
+  font-style: italic !important;
+}
+
+.login-input:focus {
+  background: rgba(255, 255, 255, 1) !important;
+  color: #000000 !important; /* Pure black text when focused */
+  border-color: #10b981 !important;
+  box-shadow: 
+    0 0 0 3px rgba(16, 185, 129, 0.15),
+    0 4px 12px rgba(16, 185, 129, 0.25) !important;
+  transform: translateY(-1px);
+  outline: none !important;
+  z-index: 40 !important;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.3) !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+.login-input:hover {
+  background: rgba(255, 255, 255, 0.99) !important;
+  color: #111827 !important; /* Ensure dark text on hover */
+  border-color: rgba(16, 185, 129, 0.4) !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+.login-input:active {
+  background: rgba(255, 255, 255, 1) !important;
+  color: #000000 !important; /* Pure black text when active */
+  border-color: #10b981 !important;
+  -webkit-text-fill-color: #000000 !important;
+}
+
+/* Ensure login form inputs are always visible - additional safety */
+.login-input:not(:placeholder-shown) {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  opacity: 1 !important;
+  -webkit-opacity: 1 !important;
+}
+
+/* Fix for input blur state - ensure text remains dark when losing focus */
+.login-input:not(:focus):not(:placeholder-shown) {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+  background: rgba(255, 255, 255, 0.95) !important;
+  opacity: 1 !important;
+  -webkit-opacity: 1 !important;
+}
+
+/* Additional safety for all login inputs */
+input.login-input {
+  color: #111827 !important;
+  -webkit-text-fill-color: #111827 !important;
+}
+
+/* ====== END LOGIN FORM STYLING ====== */
+
+/* Ensure form elements are always interactive */
+form input, form select, form textarea, form button {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  position: relative;
+  z-index: 25 !important;
+}
+
+/* Additional text visibility for all inputs */
+input[type="email"], input[type="password"], input[type="text"] {
+  color: #111827 !important;
+  font-weight: 700 !important;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.2) !important;
+  -webkit-text-fill-color: #111827 !important;
+  -webkit-opacity: 1 !important;
+  opacity: 1 !important;
+}
+
+input[type="email"]:focus, input[type="password"]:focus, input[type="text"]:focus {
+  color: #000000 !important;
+  -webkit-text-fill-color: #000000 !important;
+  text-shadow: 0 0 1px rgba(0, 0, 0, 0.3) !important;
+}
+
+form button {
+  user-select: none !important;
+  -webkit-user-select: none !important;
+  cursor: pointer !important;
+}
+
+/* Prevent any overlay interference */
+.login-form-card form {
+  position: relative;
+  z-index: 30 !important;
+  pointer-events: auto !important;
+}
+
+.login-form-card .relative {
+  z-index: 30 !important;
+}
+
+.glass-morph {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+.glass-morph-card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 25px 50px rgba(0, 0, 0, 0.25),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1),
+    0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.glass-morph-light {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 
+    0 15px 35px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.08);
+}
+
+/* Modern gradient text effects */
+.gradient-text {
+  background: linear-gradient(135deg, #10b981, #34d399, #6ee7b7);
+  background-size: 300% 300%;
+  animation: gradient-shift 4s ease-in-out infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-primary {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease-in-out infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-secondary {
+  background: linear-gradient(135deg, #3b82f6 0%, #60a5fa 50%, #93c5fd 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease-in-out infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.gradient-text-accent {
+  background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 50%, #fcd34d 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease-in-out infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Modern Button System with Neumorphism and Glass effects */
+.btn-primary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+  background-size: 200% 200%;
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  border: 1px solid rgba(16, 185, 129, 0.3);
+  color: white;
+  font-weight: 700;
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 10px 30px rgba(16, 185, 129, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-primary::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+  transition: left 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  z-index: 1;
+}
+
+.btn-primary:hover::before {
+  left: 100%;
+}
+
+.btn-primary span {
+  position: relative;
+  z-index: 2;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #059669 0%, #047857 50%, #065f46 100%);
+  background-position: right center;
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(16, 185, 129, 0.3),
+    0 0 30px rgba(16, 185, 129, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+  border-color: rgba(16, 185, 129, 0.6);
+}
+
+.btn-primary:active {
+  transform: translateY(-1px) scale(1.01);
+  transition: all 0.1s ease;
+}
+
+.btn-primary:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+  transform: none;
+  box-shadow: 0 5px 15px rgba(16, 185, 129, 0.1);
+}
+
+/* Secondary Button with Modern Blue Theme */
+.btn-secondary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+  background-size: 200% 200%;
+  color: white;
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  backdrop-filter: blur(10px);
+  box-shadow: 
+    0 10px 30px rgba(59, 130, 246, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(59, 130, 246, 0.3),
+    0 0 30px rgba(59, 130, 246, 0.2),
+    0 0 0 1px rgba(255, 255, 255, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3);
+}
+
+/* Ghost Button with Enhanced Visibility */
+.btn-ghost {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2) 0%, rgba(255, 255, 255, 0.12) 100%);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(255, 255, 255, 0.4);
+  color: white;
+  font-weight: 700;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  position: relative;
+  overflow: hidden;
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    0 0 0 1px rgba(255, 255, 255, 0.1);
+}
+
+.btn-ghost:hover {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.9) 0%, rgba(5, 150, 105, 0.95) 100%);
+  border-color: rgba(16, 185, 129, 0.8);
+  transform: translateY(-3px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(16, 185, 129, 0.4),
+    0 0 30px rgba(16, 185, 129, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  text-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.btn-ghost::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, transparent 50%, rgba(34, 197, 94, 0.1) 100%);
+  border-radius: inherit;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+.btn-ghost:hover::before {
+  opacity: 1;
+}
+
+/* Navbar responsive fixes */
+.navbar-enhanced {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+  min-height: 4rem;
+}
+
+/* Ensure navbar content doesn't overflow */
+@media (max-width: 1280px) {
+  .navbar-enhanced .flex.items-center.gap-4 {
+    gap: 0.75rem !important;
+  }
+  
+  .navbar-enhanced .px-6 {
+    padding-left: 1rem !important;
+    padding-right: 1rem !important;
+  }
+  
+  .navbar-enhanced .text-4xl {
+    font-size: 1.875rem !important;
+  }
+}
+
+@media (max-width: 1024px) {
+  .navbar-enhanced .flex.items-center.gap-4 {
+    gap: 0.5rem !important;
+  }
+  
+  .navbar-enhanced .px-4 {
+    padding-left: 0.75rem !important;
+    padding-right: 0.75rem !important;
+  }
+}
+
+/* Modern shadow effects */
+.shadow-glow {
+  box-shadow: 0 10px 25px rgba(16, 185, 129, 0.3);
+}
+
+.shadow-glow-lg {
+  box-shadow: 0 20px 40px rgba(16, 185, 129, 0.4);
+}
+
+.shadow-modern {
+  box-shadow: var(--modern-shadow);
+}
+
+/* Enhanced gradient backgrounds for navbar and components */
+.bg-gradient-primary {
+  background: linear-gradient(135deg, #10b981 0%, #059669 50%, #047857 100%);
+}
+
+.bg-gradient-secondary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+}
+
+.bg-gradient-accent {
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 50%, #b45309 100%);
+}
+
+/* Enhanced navbar visibility */
+.navbar-enhanced {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.95) 0%, rgba(255, 255, 255, 0.85) 100%);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border-bottom: 2px solid rgba(16, 185, 129, 0.2);
+  box-shadow: 
+    0 10px 25px rgba(0, 0, 0, 0.1),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9);
+}
+
+/* Enhanced gradient text with fallback colors for better visibility */
+.gradient-text-primary {
+  background: linear-gradient(135deg, #10b981 0%, #34d399 50%, #6ee7b7 100%);
+  background-size: 200% 200%;
+  animation: gradient-shift 4s ease-in-out infinite;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  
+  /* Fallback for browsers that don't support gradient text */
+  color: #10b981;
+  font-weight: 900;
+}
+
+/* Enhanced nav link visibility */
+.nav-link {
+  position: relative;
+  color: #374151 !important;
+  font-weight: 600;
+  transition: all 0.3s ease;
+  text-shadow: none;
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: -2px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: linear-gradient(90deg, #10b981, #34d399);
+  transition: width 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #10b981 !important;
+  font-weight: 700;
+  text-shadow: none;
+}
+
+.nav-link:hover::after {
+  width: 100%;
+}
+
+/* Enhanced utility classes for new design system */
+.glass-morph {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.glass-morph-light {
+  background: rgba(255, 255, 255, 0.05);
+  backdrop-filter: blur(15px);
+  -webkit-backdrop-filter: blur(15px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.glass-morph-card {
+  background: rgba(255, 255, 255, 0.12);
+  backdrop-filter: blur(25px);
+  -webkit-backdrop-filter: blur(25px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.25);
+}
+
+.glass-morph-dropdown {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+/* Enhanced Input System with Better Visibility */
+.input-glass {
+  background: rgba(30, 41, 59, 0.9) !important; /* Solid dark background */
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 2px solid rgba(16, 185, 129, 0.3);
+  box-shadow: 
+    0 8px 25px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+  color: white !important;
+  position: relative;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5); /* Add text shadow for better visibility */
+}
+
+.input-glass::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.1), transparent);
+  transition: left 0.6s ease;
+  z-index: 0;
+}
+
+.input-glass:focus::before {
+  left: 100%;
+}
+
+.input-glass:focus {
+  background: rgba(15, 23, 42, 0.95) !important; /* Even darker when focused */
+  border-color: #10b981;
+  box-shadow: 
+    0 0 30px rgba(16, 185, 129, 0.4),
+    0 15px 35px rgba(0, 0, 0, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  outline: none;
+  transform: translateY(-2px);
+  color: white !important;
+}
+
+/* Enhanced placeholder and text styling for all input types */
+.input-glass::placeholder {
+  color: rgba(156, 163, 175, 0.8) !important; /* Better placeholder visibility */
+  font-weight: 400;
+}
+
+input::-webkit-input-placeholder { 
+  color: rgba(156, 163, 175, 0.8) !important; 
+  font-weight: 400;
+}
+input::-moz-placeholder { 
+  color: rgba(156, 163, 175, 0.8) !important; 
+  font-weight: 400;
+}
+input:-ms-input-placeholder { 
+  color: rgba(156, 163, 175, 0.8) !important; 
+  font-weight: 400;
+}
+input::-ms-input-placeholder { 
+  color: rgba(156, 163, 175, 0.8) !important; 
+  font-weight: 400;
+}
+
+/* Enhanced select styling */
+select option {
+  background: #1e293b !important;
+  color: white !important;
+  padding: 12px 16px;
+  font-weight: 500;
+}
+
+/* Global input text visibility with modern typography */
+input, textarea, select {
+  color: white !important;
+  font-weight: 500;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  -webkit-text-fill-color: white !important;
+  opacity: 1 !important;
+  -webkit-opacity: 1 !important;
+}
+
+/* Ensure input text is never transparent */
+input:not(:placeholder-shown) {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+}
+
+/* Date input specific styling */
+input[type="date"] {
+  color: white !important;
+  -webkit-text-fill-color: white !important;
+}
+
+/* Enhanced file input styling */
+input[type="file"] {
+  color: #e2e8f0 !important; /* Light gray text for file input */
+  background: transparent !important;
+  border: none !important;
+}
+
+input[type="file"]::file-selector-button {
+  background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 1rem !important;
+  padding: 1rem 2rem !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  margin-right: 1rem !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+}
+
+input[type="file"]::file-selector-button:hover {
+  background: linear-gradient(135deg, #059669 0%, #0d9488 100%) !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Webkit browsers (Chrome, Safari, Edge) */
+input[type="file"]::-webkit-file-upload-button {
+  background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%) !important;
+  color: white !important;
+  border: none !important;
+  border-radius: 1rem !important;
+  padding: 1rem 2rem !important;
+  font-weight: bold !important;
+  cursor: pointer !important;
+  margin-right: 1rem !important;
+  transition: all 0.3s ease !important;
+  box-shadow: 0 4px 15px rgba(16, 185, 129, 0.3) !important;
+}
+
+input[type="file"]::-webkit-file-upload-button:hover {
+  background: linear-gradient(135deg, #059669 0%, #0d9488 100%) !important;
+  transform: scale(1.05) !important;
+  box-shadow: 0 6px 20px rgba(16, 185, 129, 0.4) !important;
+}
+
+/* Enhanced submit button styling for upload form */
+button[type="submit"] {
+  position: relative !important;
+  z-index: 10 !important;
+  overflow: visible !important;
+}
+
+button[type="submit"]:not(:disabled) {
+  background: linear-gradient(135deg, #10b981 0%, #14b8a6 100%) !important;
+  color: white !important;
+  border: 2px solid rgba(16, 185, 129, 0.5) !important;
+  box-shadow: 0 8px 25px rgba(16, 185, 129, 0.3) !important;
+}
+
+button[type="submit"]:not(:disabled):hover {
+  background: linear-gradient(135deg, #059669 0%, #0d9488 100%) !important;
+  border-color: rgba(16, 185, 129, 0.8) !important;
+  box-shadow: 0 12px 30px rgba(16, 185, 129, 0.4) !important;
+  transform: translateY(-2px) scale(1.02) !important;
+}
+
+button[type="submit"]:disabled {
+  background: linear-gradient(135deg, #6b7280 0%, #4b5563 100%) !important;
+  color: #d1d5db !important;
+  border-color: rgba(107, 114, 128, 0.5) !important;
+  box-shadow: 0 4px 15px rgba(107, 114, 128, 0.2) !important;
+  cursor: not-allowed !important;
+  transform: none !important;
+}
+
+input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+  opacity: 0.8;
+}
+
+/* File input enhancement */
+input[type="file"] {
+  color: white !important;
+}
+input[type="text"], 
+input[type="email"], 
+input[type="password"],
+input[type="tel"],
+input[type="url"],
+input[type="search"],
+textarea,
+select {
+  color: white !important;
+  font-weight: 500;
+  letter-spacing: 0.025em;
+}
+
+/* Enhanced form validation with modern design */
+input:invalid:not(:placeholder-shown) {
+  border-color: #ef4444 !important;
+  box-shadow: 
+    0 0 20px rgba(239, 68, 68, 0.3),
+    0 8px 25px rgba(239, 68, 68, 0.1) !important;
+}
+
+input:valid:not(:placeholder-shown) {
+  border-color: #10b981 !important;
+  box-shadow: 
+    0 0 20px rgba(16, 185, 129, 0.3),
+    0 8px 25px rgba(16, 185, 129, 0.1) !important;
+}
+
+/* Modern utility classes */
+.bg-shimmer {
+  background: linear-gradient(
+    45deg,
+    transparent 30%,
+    rgba(255, 255, 255, 0.1) 50%,
+    transparent 70%
+  );
+  background-size: 200% 200%;
+}
+
+.animate-pulse-slow {
+  animation: pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+/* Modern text effects */
+.font-display {
+  font-family: 'Outfit', 'Inter', sans-serif;
+  font-weight: 800;
+  letter-spacing: -0.025em;
+}
+
+.text-shadow-glow {
+  text-shadow: 
+    0 0 10px rgba(16, 185, 129, 0.5),
+    0 0 20px rgba(16, 185, 129, 0.3),
+    0 0 30px rgba(16, 185, 129, 0.1);
+}
+
+/* Modern card hover effects */
+.hover-lift {
+  transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.hover-lift:hover {
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: var(--modern-shadow);
+}
+
+.btn-secondary {
+  background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 50%, #1e40af 100%);
+  color: white;
+  border: none;
+  transition: all 0.3s ease;
+}
+
+.btn-secondary:hover {
+  background: linear-gradient(135deg, #2563eb 0%, #1e40af 50%, #1e3a8a 100%);
+  transform: translateY(-2px);
+}
+
+.nav-link {
+  color: rgba(255, 255, 255, 0.8);
+  position: relative;
+  padding: 0.5rem 1rem;
+  border-radius: 0.5rem;
+  transition: all 0.3s ease;
+}
+
+.nav-link:hover {
+  color: #10b981;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.gradient-text-primary {
+  background: linear-gradient(135deg, #34d399, #10b981, #059669);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.gradient-text-secondary {
+  background: linear-gradient(135deg, #60a5fa, #3b82f6, #2563eb);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 3s ease infinite;
+}
+
+.gradient-text-accent {
+  background: linear-gradient(135deg, #fcd34d, #f59e0b, #d97706);
+  background-size: 200% 200%;
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: gradient-shift 3s ease infinite;
+}
+
+@keyframes gradient-shift {
+  0% { background-position: 0% 50%; }
+  50% { background-position: 100% 50%; }
+  100% { background-position: 0% 50%; }
+}
+
+.animate-in {
+  animation: slideInDown 0.3s ease-out;
+}
+
+@keyframes slideInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+::selection {
+  background: rgba(16, 185, 129, 0.3);
+  color: white;
+}
+
+/* ===== ADDITIONAL UTILITY CLASSES ===== */
+.card-hover {
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+
+.card-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  filter: brightness(1.1);
+}
+
+.loading-shimmer {
+  background: linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.1) 50%, transparent 100%);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.status-indicator {
+  position: relative;
+}
+
+.status-indicator::before {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 12px;
+  height: 12px;
+  background: #10b981;
+  border-radius: 50%;
+  border: 2px solid rgba(15, 23, 42, 0.9);
+  animation: pulse 2s infinite;
+}
+
+.interactive {
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.interactive:hover {
+  transform: scale(1.05);
+}
+
+.interactive:active {
+  transform: scale(0.95);
+}
+
+/* Scrollbar styling */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-radius: 4px;
+  transition: all 0.3s ease;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(135deg, #34d399, #10b981);
+}

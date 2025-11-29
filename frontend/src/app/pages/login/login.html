@@ -1,60 +1,70 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-900 via-emerald-900 to-slate-900 flex items-center justify-center px-6">
-  <!-- Animated background -->
-  <div class="absolute inset-0 -z-10 overflow-hidden">
-    <div class="absolute top-20 left-20 w-96 h-96 bg-emerald-600 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
-    <div class="absolute bottom-20 right-20 w-80 h-80 bg-lime-500 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
-  </div>
-
+<div class="min-h-screen flex items-center justify-center px-6 relative bg-gradient-to-br from-emerald-50 via-teal-50 to-cyan-50">
   <!-- Login Card -->
-  <div class="w-full max-w-md">
-    <div class="backdrop-blur-2xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl p-10">
+  <div class="w-full max-w-md relative z-20">
+    
+    <div class="login-form-card border border-emerald-200/30 rounded-3xl shadow-glow p-10 relative z-30">
       <!-- Logo + Title -->
       <div class="text-center mb-10">
-        <h1 class="text-5xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 to-lime-400">
-          FarmChainX
+        <div class="flex justify-center mb-6">
+          <div class="w-16 h-16 rounded-2xl bg-gradient-primary flex items-center justify-center shadow-glow animate-pulse-slow">
+            <span class="text-white font-black text-3xl font-display">F</span>
+          </div>
+        </div>
+        <h1 class="text-5xl font-black font-display gradient-text-primary mb-2">
+          FarmChain<span class="text-emerald-600">X</span>
         </h1>
-        <p class="text-xl text-gray-300 mt-3">Welcome back</p>
+        <p class="text-xl text-gray-700 font-semibold">Welcome back to the future</p>
       </div>
 
       <!-- Login Form -->
       <form (ngSubmit)="login()" #f="ngForm" autocomplete="off" class="space-y-6">
-        <div>
+        <div class="relative">
+          <label for="email" class="block text-sm font-bold text-gray-800 mb-2">Email Address</label>
           <input
-            class="w-full px-6 py-4 bg-white/10 border border-white/30 rounded-2xl placeholder-gray-400 text-white focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/20 transition"
+            id="email"
+            class="login-input w-full px-6 py-4 rounded-2xl focus:outline-none transition-all duration-300 font-semibold text-gray-800 z-10 relative"
             name="email"
             type="email"
-            placeholder="Email address"
+            placeholder="Enter your email address"
             [(ngModel)]="email"
             required
+            tabindex="1"
+            autocomplete="email"
+            style="color: #111827 !important; font-weight: 700 !important; text-shadow: 0 0 1px rgba(0, 0, 0, 0.2) !important;"
           />
         </div>
 
-        <div>
+        <div class="relative">
+          <label for="password" class="block text-sm font-bold text-gray-800 mb-2">Password</label>
           <input
-            class="w-full px-6 py-4 bg-white/10 border border-white/30 rounded-2xl placeholder-gray-400 text-white focus:outline-none focus:border-emerald-400 focus:ring-4 focus:ring-emerald-500/20 transition"
+            id="password"
+            class="login-input w-full px-6 py-4 rounded-2xl focus:outline-none transition-all duration-300 font-semibold text-gray-800 z-10 relative"
             name="password"
             type="password"
-            placeholder="Password"
+            placeholder="Enter your password"
             [(ngModel)]="password"
             required
+            tabindex="2"
+            autocomplete="current-password"
+            style="color: #111827 !important; font-weight: 700 !important; text-shadow: 0 0 1px rgba(0, 0, 0, 0.2) !important;"
           />
         </div>
 
         <button
           type="submit"
           [disabled]="f.invalid"
-          class="w-full relative overflow-hidden bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-bold text-lg py-5 rounded-2xl shadow-2xl transform hover:scale-105 transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full relative overflow-hidden bg-gradient-to-r from-emerald-500 via-emerald-600 to-green-600 hover:from-emerald-600 hover:via-emerald-700 hover:to-green-700 text-white font-bold text-lg py-5 rounded-2xl shadow-lg hover:shadow-xl hover:shadow-emerald-500/30 transform hover:scale-[1.02] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100 group cursor-pointer border border-emerald-400/30 z-20"
+          tabindex="3"
         >
-          <span class="relative z-10">Login to Dashboard</span>
-          <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+          <span class="relative z-10 font-display font-bold">Login to Dashboard</span>
         </button>
       </form>
 
       <!-- Register Link -->
       <div class="mt-8 text-center">
-        <p class="text-gray-400">
+        <p class="text-gray-700 font-semibold">
           Don't have an account?
-          <a routerLink="/register" class="font-bold text-emerald-400 hover:text-emerald-300 transition">
+          <a routerLink="/register" class="font-bold text-emerald-600 hover:text-emerald-700 transition-all duration-300 ml-2 underline decoration-2 underline-offset-2">
             Register here
           </a>
         </p>
@@ -62,13 +72,18 @@
 
       <!-- Decorative bottom glow -->
       <div class="mt-10 flex justify-center">
-        <div class="w-24 h-1 bg-gradient-to-r from-emerald-500 to-lime-500 rounded-full"></div>
+        <div class="w-32 h-1 bg-gradient-to-r from-emerald-400 to-green-500 rounded-full shadow-glow animate-pulse-slow"></div>
       </div>
     </div>
 
     <!-- Trust badge -->
-    <p class="text-center text-gray-500 text-sm mt-8">
-      Secured by blockchain • End-to-end encrypted
-    </p>
+    <div class="text-center mt-8">
+      <p class="text-gray-600 text-sm font-semibold flex items-center justify-center gap-2">
+        <svg class="w-4 h-4 text-emerald-500" fill="currentColor" viewBox="0 0 20 20">
+          <path fill-rule="evenodd" d="M2.166 4.999A11.954 11.954 0 0010 1.944 11.954 11.954 0 0017.834 5c.11.65.166 1.32.166 2.001 0 5.225-3.34 9.67-8 11.317C5.34 16.67 2 12.225 2 7c0-.682.057-1.35.166-2.001zm11.541 3.708a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path>
+        </svg>
+        Secured by blockchain • End-to-end encrypted
+      </p>
+    </div>
   </div>
 </div>

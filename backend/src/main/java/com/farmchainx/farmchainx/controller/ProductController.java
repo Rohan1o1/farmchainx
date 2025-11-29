@@ -10,6 +10,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -27,6 +28,7 @@ import com.farmchainx.farmchainx.repository.SupplyChainLogRepository;
 import com.farmchainx.farmchainx.repository.UserRepository;
 import com.farmchainx.farmchainx.service.ProductService;
 import com.farmchainx.farmchainx.util.HashUtil;
+import com.cloudinary.Cloudinary;
 
 @RestController
 @RequestMapping("/api")
@@ -37,17 +39,20 @@ public class ProductController {
     private final UserRepository userRepository;
     private final SupplyChainLogRepository supplyChainLogRepository;
     private final FeedbackRepository feedbackRepository;
+    private final Cloudinary cloudinary;
 
     public ProductController(ProductService productService,
                              UserRepository userRepository,
                              ProductRepository productRepository,
                              SupplyChainLogRepository supplyChainLogRepository,
-                             FeedbackRepository feedbackRepository) {
+                             FeedbackRepository feedbackRepository,
+                             Cloudinary cloudinary) {
         this.productService = productService;
         this.userRepository = userRepository;
         this.productRepository = productRepository;
         this.supplyChainLogRepository = supplyChainLogRepository;
         this.feedbackRepository = feedbackRepository;
+        this.cloudinary = cloudinary;
     }
 
     @PostMapping("/products/upload")
@@ -69,9 +74,6 @@ public class ProductController {
             User farmer = userRepository.findByEmail(email)
                     .orElseThrow(() -> new RuntimeException("Farmer not found"));
 
-            com.cloudinary.Cloudinary cloudinary = new com.cloudinary.Cloudinary(
-                "cloudinary://277141844455857:97X4bTcgIE4UpDdJOdUh719uJiw@dyxha7yei"   //Please change the infos
-            );
             java.util.Map uploadResult = cloudinary.uploader().upload(
                 imageFile.getBytes(),
                 com.cloudinary.utils.ObjectUtils.asMap("folder", "farmchainx/products")
@@ -114,7 +116,7 @@ public class ProductController {
         }
     }
 
-    @PreAuthorize("hasRole('FARMER')")
+    @PreAuthorize("hasAnyRole('FARMER', 'ADMIN')")
     @GetMapping("/products/my")
     public ResponseEntity<?> getMyProducts(
             Principal principal,
@@ -125,8 +127,8 @@ public class ProductController {
         if (principal == null) return ResponseEntity.status(401).body(Map.of("error", "Authentication required"));
 
         String email = principal.getName();
-        User farmer = userRepository.findByEmail(email)
-                .orElseThrow(() -> new RuntimeException("Farmer not found"));
+        User currentUser = userRepository.findByEmail(email)
+                .orElseThrow(() -> new RuntimeException("User not found"));
 
         String[] parts = sort.split(",", 2);
         String sortProp = parts[0];
@@ -139,11 +141,23 @@ public class ProductController {
                 sortProp
         );
 
-        var pageRes = productRepository.findByFarmerId(farmer.getId(), pageable);
+        // Check if user is admin
+        boolean isAdmin = currentUser.getRoles().stream()
+                .anyMatch(r -> "ROLE_ADMIN".equalsIgnoreCase(r.getName()));
+
+        Page<?> pageRes;
+        if (isAdmin) {
+            // Admin sees all products
+            pageRes = productRepository.findAll(pageable);
+        } else {
+            // Farmer sees only their products
+            pageRes = productRepository.findByFarmerId(currentUser.getId(), pageable);
+        }
+
         return ResponseEntity.ok(pageRes);
     }
 
-    @PreAuthorize("hasAnyRole('FARMER','ADMIN')")
+    @PreAuthorize("hasAnyRole('FARMER','DISTRIBUTOR','ADMIN')")
     @PostMapping("/products/{id}/qrcode")
     public ResponseEntity<?> generateProductQrCode(@PathVariable Long id, Principal principal) {
         if (principal == null) return ResponseEntity.status(401).body(Map.of("error", "Authentication required"));
@@ -156,8 +170,11 @@ public class ProductController {
         boolean isOwner = product.getFarmer().getId().equals(currentUser.getId());
         boolean isAdmin = currentUser.getRoles().stream()
                 .anyMatch(r -> "ROLE_ADMIN".equalsIgnoreCase(r.getName()));
+        boolean isDistributor = currentUser.getRoles().stream()
+                .anyMatch(r -> "ROLE_DISTRIBUTOR".equalsIgnoreCase(r.getName()));
 
-        if (!isOwner && !isAdmin) {
+        // Allow access if: owner, admin, or distributor (distributors can generate QR for any product they have access to)
+        if (!isOwner && !isAdmin && !isDistributor) {
             return ResponseEntity.status(403).body(Map.of("error", "You can only generate QR for your own products"));
         }
 
@@ -366,5 +383,132 @@ public class ProductController {
         }
 
         return ResponseEntity.badRequest().body(Map.of("error", "Invalid action"));
+    }
+
+    // Endpoint for distributors to see products they currently own/possess
+    @PreAuthorize("hasRole('DISTRIBUTOR')")
+    @GetMapping("/products/available")
+    public ResponseEntity<?> getAvailableProductsForDistributor(
+            Principal principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size,
+            @RequestParam(defaultValue = "id,desc") String sort) {
+
+        if (principal == null) return ResponseEntity.status(401).body(Map.of("error", "Authentication required"));
+
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String[] parts = sort.split(",", 2);
+        String sortProp = parts[0];
+        boolean asc = parts.length > 1 && "asc".equalsIgnoreCase(parts[1]);
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                asc ? Sort.Direction.ASC : Sort.Direction.DESC,
+                sortProp
+        );
+
+        // Find products that this distributor currently owns/possesses
+        var result = productRepository.findProductsOwnedByDistributor(user.getId(), pageable);
+        return ResponseEntity.ok(result);
+    }
+    
+    // Endpoint for distributors to see products available for pickup from farmers
+    @PreAuthorize("hasRole('DISTRIBUTOR')")
+    @GetMapping("/products/pickup")
+    public ResponseEntity<?> getProductsForPickup(
+            Principal principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size,
+            @RequestParam(defaultValue = "id,desc") String sort) {
+
+        if (principal == null) return ResponseEntity.status(401).body(Map.of("error", "Authentication required"));
+
+        String[] parts = sort.split(",", 2);
+        String sortProp = parts[0];
+        boolean asc = parts.length > 1 && "asc".equalsIgnoreCase(parts[1]);
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                asc ? Sort.Direction.ASC : Sort.Direction.DESC,
+                sortProp
+        );
+
+        // Find products that haven't been picked up by any distributor yet
+        var result = productRepository.findProductsAvailableForPickup(pageable);
+        return ResponseEntity.ok(result);
+    }
+
+    // Endpoint for retailers to see available products from distributors
+    @PreAuthorize("hasRole('RETAILER')")
+    @GetMapping("/products/pending")
+    public ResponseEntity<?> getPendingProductsForRetailer(
+            Principal principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size,
+            @RequestParam(defaultValue = "id,desc") String sort) {
+
+        User user = userRepository.findByEmail(principal.getName())
+                .orElseThrow(() -> new RuntimeException("User not found"));
+
+        String[] parts = sort.split(",", 2);
+        String sortProp = parts[0];
+        boolean asc = parts.length > 1 && "asc".equalsIgnoreCase(parts[1]);
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                asc ? Sort.Direction.ASC : Sort.Direction.DESC,
+                sortProp
+        );
+
+        // Find supply chain logs for this retailer and get the associated products
+        var supplyChainLogs = supplyChainLogRepository.findProductsPendingForRetailer(user.getId(), pageable);
+        
+        // Extract product IDs and fetch products
+        var productIds = supplyChainLogs.getContent().stream()
+                .map(SupplyChainLog::getProductId)
+                .distinct()
+                .toList();
+        
+        var products = productRepository.findAllById(productIds);
+        
+        return ResponseEntity.ok(Map.of(
+                "content", products,
+                "totalPages", supplyChainLogs.getTotalPages(),
+                "totalElements", supplyChainLogs.getTotalElements(),
+                "size", supplyChainLogs.getSize(),
+                "number", supplyChainLogs.getNumber()
+        ));
+    }
+
+    // Endpoint for consumers to see available products from retailers
+    @PreAuthorize("hasRole('CONSUMER')")
+    @GetMapping("/products/retail")
+    public ResponseEntity<?> getRetailProductsForConsumer(
+            Principal principal,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size,
+            @RequestParam(defaultValue = "id,desc") String sort) {
+
+        if (principal == null) return ResponseEntity.status(401).body(Map.of("error", "Authentication required"));
+
+        String[] parts = sort.split(",", 2);
+        String sortProp = parts[0];
+        boolean asc = parts.length > 1 && "asc".equalsIgnoreCase(parts[1]);
+
+        Pageable pageable = PageRequest.of(
+                page,
+                size,
+                asc ? Sort.Direction.ASC : Sort.Direction.DESC,
+                sortProp
+        );
+
+        // Find products that have reached retailers and are available to consumers
+        var result = productRepository.findProductsAvailableToConsumers(pageable);
+        return ResponseEntity.ok(result);
     }
 }

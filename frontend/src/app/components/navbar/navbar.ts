@@ -35,7 +35,13 @@ export class Navbar {
   }
 
   logout() {
+    console.log('Logout button clicked');
     this.auth.logout();
     this.router.navigate(['/login']);
+  }
+
+  goToHome() {
+    console.log('Home logo clicked');
+    this.router.navigate(['/']);
   }
 }

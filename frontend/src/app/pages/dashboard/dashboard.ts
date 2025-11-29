@@ -18,6 +18,8 @@ export class Dashboard implements AfterViewInit {
   name = this.authService.getName() || 'User';
   role = this.authService.getRole()?.replace('ROLE_', '') || 'USER';
   isAdmin = this.authService.isAdmin();
+  isFarmer = this.authService.hasRole('ROLE_FARMER');
+  isDistributor = this.authService.hasRole('ROLE_DISTRIBUTOR');
 
   ngAfterViewInit(): void {
     const ringColor =

@@ -40,6 +40,11 @@ export const routes: Routes = [
     loadComponent: () => import('./pages/my-products/my-products').then(m => m.MyProducts)
   },
   {
+    path: 'product/:id',
+    canActivate: [AuthGuard],
+    loadComponent: () => import('./pages/product-detail/product-detail').then(m => m.ProductDetailComponent)
+  },
+  {
     path: 'admin',
     canActivate: [AuthGuard, AdminGuard],
     loadComponent: () => import('./pages/admin/admin-layout/admin-layout').then(m => m.AdminLayout),

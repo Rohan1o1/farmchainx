@@ -1,0 +1,51 @@
+/* Admin Sidebar Enhanced Visibility */
+aside {
+  background: linear-gradient(135deg, rgba(15, 23, 42, 0.95) 0%, rgba(30, 41, 59, 0.95) 100%);
+  box-shadow: 
+    4px 0 20px rgba(16, 185, 129, 0.1),
+    inset -1px 0 0 rgba(16, 185, 129, 0.2);
+}
+
+nav a {
+  position: relative;
+  overflow: hidden;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+nav a::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.05) 0%, transparent 50%);
+  opacity: 0;
+  transition: opacity 0.3s ease;
+}
+
+nav a:hover::before {
+  opacity: 1;
+}
+
+nav a.router-link-active {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.2) 0%, rgba(5, 150, 105, 0.15) 100%);
+  box-shadow: 
+    0 4px 15px rgba(16, 185, 129, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.1);
+}
+
+nav a.router-link-active::before {
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(34, 197, 94, 0.1) 100%);
+  opacity: 1;
+}
+
+/* Icon and text enhancement */
+nav a svg {
+  filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+}
+
+nav a span {
+  font-weight: 700;
+  letter-spacing: 0.025em;
+}

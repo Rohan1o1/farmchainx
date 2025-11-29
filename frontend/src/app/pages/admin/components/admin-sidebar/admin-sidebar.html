@@ -1,26 +1,36 @@
-<aside class="w-80 backdrop-blur-2xl bg-white/5 border-r border-white/10 flex flex-col">
-  <div class="p-10 border-b border-white/10">
-    <h2 class="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-purple-400 to-emerald-400">
+<aside class="w-80 backdrop-blur-2xl bg-slate-900/95 border-r border-emerald-500/30 flex flex-col shadow-2xl">
+  <div class="p-8 border-b border-emerald-500/20 bg-gradient-to-r from-slate-800/50 to-slate-900/50">
+    <h2 class="text-3xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-cyan-400 to-purple-400">
       FarmChainX
     </h2>
-    <p class="text-gray-400 text-sm mt-2">Admin Dashboard</p>
+    <p class="text-gray-300 text-sm mt-2 font-semibold">Admin Dashboard</p>
   </div>
 
-  <nav class="flex-1 p-6 space-y-3">
-    <a routerLink="/admin/overview" routerLinkActive="bg-white/10 border-l-4 border-emerald-400"
-       class="flex items-center gap-4 px-6 py-5 rounded-2xl hover:bg-white/10 transition text-lg font-medium">
+  <nav class="flex-1 p-6 space-y-4">
+    <a routerLink="/admin/overview" routerLinkActive="bg-emerald-500/20 border-l-4 border-emerald-400 text-emerald-300 shadow-lg"
+       class="flex items-center gap-4 px-6 py-5 rounded-xl hover:bg-emerald-500/10 hover:border-l-4 hover:border-emerald-400/50 transition-all duration-300 text-lg font-bold text-gray-200 hover:text-emerald-300 border-l-4 border-transparent">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"/>
+      </svg>
       <span>Overview</span>
     </a>
 
-    <a routerLink="/admin/users" routerLinkActive="bg-white/10 border-l-4 border-emerald-400"
-       class="flex items-center gap-4 px-6 py-5 rounded-2xl hover:bg-white/10 transition text-lg font-medium">
+    <a routerLink="/admin/users" routerLinkActive="bg-emerald-500/20 border-l-4 border-emerald-400 text-emerald-300 shadow-lg"
+       class="flex items-center gap-4 px-6 py-5 rounded-xl hover:bg-emerald-500/10 hover:border-l-4 hover:border-emerald-400/50 transition-all duration-300 text-lg font-bold text-gray-200 hover:text-emerald-300 border-l-4 border-transparent">
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197m13.5-9a2.5 2.5 0 11-5 0 2.5 2.5 0 015 0z"/>
+      </svg>
       <span>All Users</span>
     </a>
 
-    <a routerLink="/admin/promotion-requests" routerLinkActive="bg-white/10 border-l-4 border-emerald-400"
-       class="flex items-center justify-between px-6 py-5 rounded-2xl hover:bg-white/10 transition text-lg font-medium">
-      <span>Admin Requests</span>
-      <span class="bg-red-500/80 text-xs px-3 py-1 rounded-full animate-pulse">LIVE</span>
+    <a routerLink="/admin/promotion-requests" routerLinkActive="bg-emerald-500/20 border-l-4 border-emerald-400 text-emerald-300 shadow-lg"
+       class="flex items-center justify-between px-6 py-5 rounded-xl hover:bg-emerald-500/10 hover:border-l-4 hover:border-emerald-400/50 transition-all duration-300 text-lg font-bold text-gray-200 hover:text-emerald-300 border-l-4 border-transparent">
+      <div class="flex items-center gap-4">
+        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+        </svg>
+        <span>Admin Requests</span>
+      </div>
+      <span class="bg-gradient-to-r from-red-500 to-pink-500 text-white text-xs px-3 py-1 rounded-full animate-pulse shadow-lg font-bold">LIVE</span>
     </a>
   </nav>
-</aside>

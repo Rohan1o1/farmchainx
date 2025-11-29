@@ -37,21 +37,27 @@ import com.farmchainx.farmchainx.repository.UserRepository;
                 }
             }
 
-            // ✅ 2) Create default admin
-            String email = "admin@farmchainx.com";
+            // ✅ 2) Create all sample users as mentioned in README
+            createUserIfNotExists("admin@farmchainx.com", "Admin", "1234", "ROLE_ADMIN");
+            createUserIfNotExists("farmer@farmchainx.com", "Farmer", "1234", "ROLE_FARMER");
+            createUserIfNotExists("distributor@farmchainx.com", "Distributor", "1234", "ROLE_DISTRIBUTOR");
+            createUserIfNotExists("retailer@farmchainx.com", "Retailer", "1234", "ROLE_RETAILER");
+            createUserIfNotExists("consumer@farmchainx.com", "Consumer", "1234", "ROLE_CONSUMER");
+        }
 
+        private void createUserIfNotExists(String email, String name, String password, String roleName) {
             if (!userRepo.existsByEmail(email)) {
-                Role adminRole = roleRepo.findByName("ROLE_ADMIN").orElseThrow();
+                Role role = roleRepo.findByName(roleName).orElseThrow();
 
-                User admin = new User();
-                admin.setName("Admin");
-                admin.setEmail(email);
-                admin.setPassword(encoder.encode("admin123"));
-                admin.setRoles(Set.of(adminRole));
+                User user = new User();
+                user.setName(name);
+                user.setEmail(email);
+                user.setPassword(encoder.encode(password));
+                user.setRoles(Set.of(role));
 
-                userRepo.save(admin);
+                userRepo.save(user);
 
-                System.out.println("✅ Default admin created: " + email + " | password: admin123");
+                System.out.println("✅ Sample user created: " + email + " | password: " + password + " | role: " + roleName);
             }
         }
     }

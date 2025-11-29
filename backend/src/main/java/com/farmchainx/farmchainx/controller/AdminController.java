@@ -3,6 +3,7 @@ package com.farmchainx.farmchainx.controller;
 import java.time.LocalDateTime;
 import java.util.List;
 
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -11,12 +12,14 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.farmchainx.farmchainx.dto.AdminOverview;
 import com.farmchainx.farmchainx.model.AdminPromotionRequest;
 import com.farmchainx.farmchainx.model.Role;
 import com.farmchainx.farmchainx.model.User;
+import com.farmchainx.farmchainx.repository.ProductRepository;
 import com.farmchainx.farmchainx.repository.RoleRepository;
 import com.farmchainx.farmchainx.repository.UserRepository;
 import com.farmchainx.farmchainx.service.AdminOverviewService;
@@ -30,6 +33,7 @@ public class AdminController {
     private final UserRepository userRepo;
     private final RoleRepository roleRepo;
     private final AdminPromotionService promotionService;
+    private final ProductRepository productRepo;
 
     record NestedUser(String name, String email) {}
     record PromotionRequestView(Long id, LocalDateTime requestedAt, NestedUser user) {
@@ -45,11 +49,13 @@ public class AdminController {
     public AdminController(AdminOverviewService overviewService,
                            UserRepository userRepo,
                            RoleRepository roleRepo,
-                           AdminPromotionService promotionService) {
+                           AdminPromotionService promotionService,
+                           ProductRepository productRepo) {
         this.overviewService = overviewService;
         this.userRepo = userRepo;
         this.roleRepo = roleRepo;
         this.promotionService = promotionService;
+        this.productRepo = productRepo;
     }
 
     @PreAuthorize("hasRole('ADMIN')")
@@ -119,5 +125,28 @@ public class AdminController {
     @PreAuthorize("hasRole('ADMIN')")
     public List<User> getAllUsers() {
         return userRepo.findAll();
+    }
+
+    @GetMapping("/products")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<?> getAllProducts(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "9") int size,
+            @RequestParam(defaultValue = "id,desc") String sort) {
+        
+        String[] parts = sort.split(",", 2);
+        String sortProp = parts[0];
+        boolean asc = parts.length > 1 && "asc".equalsIgnoreCase(parts[1]);
+
+        org.springframework.data.domain.Pageable pageable = org.springframework.data.domain.PageRequest.of(
+                page,
+                size,
+                asc ? org.springframework.data.domain.Sort.Direction.ASC : org.springframework.data.domain.Sort.Direction.DESC,
+                sortProp
+        );
+
+        // Assuming you have a ProductRepository injected
+        var pageRes = productRepo.findAll(pageable);
+        return org.springframework.http.ResponseEntity.ok(pageRes);
     }
 }

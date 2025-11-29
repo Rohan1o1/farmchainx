@@ -1,23 +1,23 @@
 <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-8 mt-8">
-  <div class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-indigo-600 to-purple-700 p-1 shadow-2xl transform hover:scale-105 transition-all duration-500">
-    <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition"></div>
-    <div class="relative bg-slate-900/90 backdrop-blur-xl rounded-3xl p-10">
-      <h3 class="text-indigo-300 text-xl font-semibold">Total Users</h3>
-      <p class="text-7xl font-black mt-6 text-white">{{ data?.totalUsers || 0 }}</p>
-      <p class="text-indigo-400 mt-3 text-lg">Active accounts</p>
+  <div class="group relative overflow-hidden rounded-3xl bg-gradient-secondary p-1 shadow-glow transform hover:scale-105 transition-all duration-500 card-hover">
+    <div class="absolute inset-0 bg-shimmer animate-shimmer opacity-0 group-hover:opacity-30 transition-opacity"></div>
+    <div class="relative glass-morph-card rounded-3xl p-10 border border-white/20">
+      <h3 class="text-secondary-300 text-xl font-semibold font-display">Total Users</h3>
+      <p class="text-7xl font-black mt-6 text-white font-display gradient-text-secondary">{{ data?.totalUsers || 0 }}</p>
+      <p class="text-secondary-400 mt-3 text-lg font-medium">Active accounts</p>
     </div>
   </div>
 
-  <div class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-600 to-teal-700 p-1 shadow-2xl transform hover:scale-105 transition-all duration-500">
-    <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition"></div>
-    <div class="relative bg-slate-900/90 backdrop-blur-xl rounded-3xl p-10">
-      <h3 class="text-emerald-300 text-xl font-semibold">Total Products</h3>
-      <p class="text-7xl font-black mt-6 text-white">{{ data?.totalProducts || 0 }}</p>
-      <p class="text-emerald-400 mt-3 text-lg">In supply chain</p>
+  <div class="group relative overflow-hidden rounded-3xl bg-gradient-primary p-1 shadow-glow transform hover:scale-105 transition-all duration-500 card-hover">
+    <div class="absolute inset-0 bg-shimmer animate-shimmer opacity-0 group-hover:opacity-30 transition-opacity"></div>
+    <div class="relative glass-morph-card rounded-3xl p-10 border border-white/20">
+      <h3 class="text-primary-300 text-xl font-semibold font-display">Total Products</h3>
+      <p class="text-7xl font-black mt-6 text-white font-display gradient-text-primary">{{ data?.totalProducts || 0 }}</p>
+      <p class="text-primary-400 mt-3 text-lg font-medium">In supply chain</p>
     </div>
   </div>
 
-  <div class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 to-cyan-700 p-1 shadow-2xl transform hover:scale-105 transition-all duration-500">
+  <div class="group relative overflow-hidden rounded-3xl bg-gradient-to-br from-secondary-600 to-primary-700 p-1 shadow-glow transform hover:scale-105 transition-all duration-500 card-hover">
     <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 transition"></div>
     <div class="relative bg-slate-900/90 backdrop-blur-xl rounded-3xl p-10">
       <h3 class="text-blue-300 text-xl font-semibold">Supply Logs</h3>

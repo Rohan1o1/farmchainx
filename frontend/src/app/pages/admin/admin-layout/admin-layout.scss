@@ -1,0 +1,41 @@
+/* Admin Layout Enhanced Background */
+.flex.h-screen.text-white {
+  background: linear-gradient(135deg, 
+    rgba(15, 23, 42, 1) 0%, 
+    rgba(30, 41, 59, 0.98) 25%, 
+    rgba(51, 65, 85, 0.95) 50%, 
+    rgba(30, 41, 59, 0.98) 75%, 
+    rgba(15, 23, 42, 1) 100%);
+  position: relative;
+  overflow: hidden;
+}
+
+.flex.h-screen.text-white::before {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(16, 185, 129, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(139, 92, 246, 0.1) 0%, transparent 50%);
+  z-index: -1;
+  pointer-events: none;
+}
+
+/* Header enhancements */
+header {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.12) 0%, 
+    rgba(255, 255, 255, 0.08) 100%);
+  border-bottom: 1px solid rgba(16, 185, 129, 0.2);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* Main content area */
+main {
+  background: linear-gradient(135deg, 
+    rgba(255, 255, 255, 0.05) 0%, 
+    transparent 50%);
+}

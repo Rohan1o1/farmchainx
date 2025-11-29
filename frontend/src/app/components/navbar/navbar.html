@@ -1,71 +1,120 @@
-<nav class="sticky top-0 z-50 backdrop-blur-2xl bg-white/10 border-b border-white/10 shadow-2xl">
+<nav class="navbar-enhanced sticky top-0 z-50 shadow-modern">
   <div class="max-w-7xl mx-auto px-6 lg:px-8">
-    <div class="flex justify-between items-center h-20">
+    <div class="flex justify-between items-center h-16 min-h-16">
 
-      <!-- LEFT: Logo -->
+      <!-- Enhanced Logo with Home Redirect -->
       <div class="flex items-center">
-        <a routerLink="/" class="text-4xl font-black bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-lime-400 to-emerald-400 hover:from-emerald-300 hover:to-lime-300 transition">
-          FarmChainX
+        <a routerLink="/" (click)="goToHome(); $event.stopPropagation()" class="group flex items-center space-x-3 cursor-pointer">
+          <div class="relative">
+            <div class="w-12 h-12 rounded-xl bg-gradient-primary flex items-center justify-center shadow-modern transition-all duration-500 group-hover:shadow-glow group-hover:scale-110 group-hover:rotate-6">
+              <span class="text-white font-black text-2xl font-display">F</span>
+            </div>
+            <div class="absolute inset-0 w-12 h-12 rounded-xl bg-gradient-primary opacity-20 blur-xl group-hover:opacity-40 transition-opacity duration-500"></div>
+          </div>
+          <div class="flex flex-col">
+            <span class="text-2xl lg:text-3xl font-black font-display text-emerald-600 group-hover:text-emerald-700 transition-all duration-500">
+              FarmChain<span class="text-emerald-500">X</span>
+            </span>
+            <span class="text-xs text-gray-600 font-semibold tracking-wider uppercase">Blockchain Agriculture</span>
+          </div>
         </a>
       </div>
 
-      <!-- RIGHT: Navigation -->
-      <div class="flex items-center gap-8 text-lg font-medium">
+      <!-- Enhanced Navigation with Better Spacing -->
+      <div class="flex items-center gap-4 text-lg font-medium">
 
-        <!-- NOT LOGGED IN -->
+        <!-- Enhanced Login/Register Buttons -->
         <ng-container *ngIf="!isLoggedIn">
-          <a routerLink="/login" class="text-gray-300 hover:text-white transition font-semibold">
+          <a routerLink="/login" class="nav-link text-lg font-bold transition-all duration-300 hover:text-emerald-600 text-gray-800">
             Login
           </a>
           <a routerLink="/register"
-             class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-8 py-3.5 rounded-full font-bold shadow-xl transform hover:scale-105 transition">
-            Register Free
+             class="btn-primary px-8 py-4 rounded-full font-bold shadow-modern text-lg transform hover:scale-105 transition-all duration-500">
+            <span class="flex items-center gap-3">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z"/>
+              </svg>
+              Register Free
+            </span>
           </a>
         </ng-container>
 
-        <!-- LOGGED IN -->
+        <!-- Enhanced Logged In Navigation with Proper Spacing -->
         <ng-container *ngIf="isLoggedIn">
 
-          <!-- QR Scanner Button -->
+          <!-- Enhanced QR Scanner Button with Better Size -->
           <a routerLink="/scanner"
-             routerLinkActive="ring-4 ring-emerald-500/50"
-             class="group flex items-center gap-3 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white px-7 py-4 rounded-full font-bold shadow-2xl transform hover:scale-110 transition">
-            <svg class="w-6 h-6 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+             (click)="$event.stopPropagation()"
+             routerLinkActive="ring-4 ring-emerald-400/60 bg-emerald-500/30 scale-105"
+             class="group relative overflow-hidden bg-gradient-to-r from-emerald-500/95 via-lime-500/95 to-emerald-600/95 hover:from-emerald-600 hover:via-lime-600 hover:to-emerald-700 text-white border-2 border-emerald-400/50 flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-base shadow-lg hover:shadow-emerald-500/50 transform hover:scale-105 transition-all duration-500">
+            <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+            <svg class="w-5 h-5 group-hover:animate-pulse relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5"
                     d="M12 4v1m6 11h2m-6 5v1m-6-16H5a2 2 0 00-2 2v3m14-5h2a2 2 0 012 2v3m-9 9h.01" />
             </svg>
-            Scan QR
+            <span class="relative z-10 font-bold whitespace-nowrap">Scan QR</span>
           </a>
 
-          <!-- Farmer Links -->
+          <!-- My Products Button for all logged-in users -->
+          <a routerLink="/products/my" 
+             (click)="$event.stopPropagation()"
+             routerLinkActive="ring-4 ring-blue-400/60 bg-blue-500/30 scale-105"
+             class="group relative overflow-hidden bg-gradient-to-r from-blue-500/95 via-cyan-500/95 to-blue-600/95 hover:from-blue-600 hover:via-cyan-600 hover:to-blue-700 text-white border-2 border-blue-400/50 flex items-center gap-2 px-6 py-3 rounded-xl font-bold text-base shadow-lg hover:shadow-blue-500/50 transform hover:scale-105 transition-all duration-500">
+            <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+            <svg class="w-5 h-5 group-hover:animate-bounce relative z-10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 1h6v6H9z"/>
+            </svg>
+            <span class="relative z-10 font-bold whitespace-nowrap">My Products</span>
+          </a>
+
+          <!-- Enhanced Farmer Navigation with Compact Design -->
           <ng-container *ngIf="isFarmer">
-            <a routerLink="/upload" routerLinkActive="text-emerald-400 font-bold"
-               class="text-gray-300 hover:text-white transition">Upload</a>
-            <a routerLink="/products/my" routerLinkActive="text-emerald-400 font-bold"
-               class="text-gray-300 hover:text-white transition">My Products</a>
+            <a routerLink="/upload" 
+               (click)="$event.stopPropagation()"
+               routerLinkActive="text-emerald-600 font-bold border-b-2 border-emerald-600"
+               class="nav-link font-bold transition-all duration-300 px-3 py-2 rounded-lg hover:bg-emerald-500/10 text-gray-800">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12"/>
+                </svg>
+                Upload
+              </span>
+            </a>
           </ng-container>
 
-          <!-- ADMIN PANEL — GOD MODE ACTIVATED -->
-          <a routerLink="/admin" *ngIf="isAdmin"
-             class="group relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-700 hover:via-pink-700 hover:to-indigo-700 text-white px-8 py-4 rounded-full font-black text-xl shadow-2xl transform hover:scale-115 transition duration-300">
-            <span class="relative z-10 flex items-center gap-3">
-              <svg class="w-7 h-7" fill="currentColor" viewBox="0 0 20 20">
+          <!-- Enhanced Admin Panel Button with Compact Design -->
+          <a routerLink="/admin" 
+             (click)="$event.stopPropagation()"
+             *ngIf="isAdmin"
+             class="group relative overflow-hidden bg-gradient-to-r from-purple-600 via-pink-600 to-indigo-600 hover:from-purple-700 hover:via-pink-700 hover:to-indigo-700 text-white px-6 py-3 rounded-xl font-bold text-base shadow-lg transform hover:scale-105 transition duration-500">
+            <span class="relative z-10 flex items-center gap-2">
+              <svg class="w-5 h-5 group-hover:animate-bounce" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M10 2a6 6 0 00-6 6v3.586l-.707.707A1 1 0 004 14h12a1 1 0 00.707-1.707L16 11.586V8a6 6 0 00-6-6zM10 18a3 3 0 01-3-3h6a3 3 0 01-3 3z"/>
               </svg>
-              Admin Panel
+              Admin
             </span>
             <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
           </a>
 
-          <!-- User Info + Logout -->
-          <div class="flex items-center gap-6 border-l border-white/20 pl-8">
-            <div class="text-right">
-              <p class="text-sm text-gray-400">Welcome back</p>
-              <p class="font-bold text-xl text-emerald-400">{{ userName }}</p>
+          <!-- Compact User Info + Logout Section -->
+          <div class="flex items-center gap-3 border-l-2 border-emerald-200/30 pl-4 ml-2 flex-shrink-0">
+            <!-- Compact User Info -->
+            <div class="bg-white/90 backdrop-blur-sm px-4 py-2 rounded-xl border border-emerald-200/50 shadow-md hover:shadow-emerald-500/20 transition-all duration-300 flex-shrink-0">
+              <div class="text-right">
+                <p class="text-xs text-gray-600 font-bold uppercase tracking-wide">{{ userRole?.replace('ROLE_', '') }}</p>
+                <p class="font-black text-sm text-emerald-600 font-display truncate max-w-32">{{ userName }}</p>
+              </div>
             </div>
-            <button (click)="logout()"
-                    class="bg-red-500/20 hover:bg-red-500/40 border border-red-500/50 text-red-400 hover:text-white px-6 py-3 rounded-full font-bold transition backdrop-blur-md">
-              Logout
+            
+            <!-- Compact Logout Button with Fixed Boundaries -->
+            <button (click)="logout(); $event.stopPropagation()" type="button"
+                    class="flex-shrink-0 relative bg-gradient-to-r from-red-500/90 via-red-600/90 to-red-700/90 hover:from-red-600 hover:via-red-700 hover:to-red-800 text-white px-4 py-2 rounded-xl font-bold transition-colors duration-300 border border-red-400/50 shadow-md hover:shadow-red-500/30 w-auto max-w-fit">
+              <span class="flex items-center gap-2">
+                <svg class="w-4 h-4 transition-transform duration-300 hover:rotate-12" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1"/>
+                </svg>
+                <span class="text-sm">Logout</span>
+              </span>
             </button>
           </div>
 

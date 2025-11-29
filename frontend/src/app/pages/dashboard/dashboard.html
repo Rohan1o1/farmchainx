@@ -1,44 +1,60 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-  <!-- Animated background blobs (optional but fire) -->
-  <div class="absolute inset-0 overflow-hidden pointer-events-none">
-    <div class="absolute -top-40 -right-40 w-80 h-80 bg-purple-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob"></div>
-    <div class="absolute -bottom-40 -left-40 w-80 h-80 bg-indigo-500 rounded-full mix-blend-multiply filter blur-3xl opacity-70 animate-blob animation-delay-2000"></div>
-    <div class="absolute top-40 left-1/2 w-80 h-80 bg-pink-500 rounded-full mix-blend-multiply filter blur-3xl opacity-50 animate-blob animation-delay-4000"></div>
-  </div>
-
+<div class="min-h-screen relative">
   <div class="relative z-10 max-w-4xl mx-auto pt-20 px-6">
-    <!-- Main Welcome Card - Glassmorphism -->
-    <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-3xl shadow-2xl overflow-hidden">
-      <div class="p-12 text-center">
-        <!-- Greeting -->
-        <h1 class="text-6xl md:text-7xl font-black text-white tracking-tight">
-          Welcome back<span class="text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-pink-400">, {{ name }}!</span>
-        </h1>
-        <p class="mt-6 text-xl text-gray-300">Ready to make today legendary?</p>
+    <!-- Main Welcome Card -->
+    <div class="glass-morph-card border border-white/20 rounded-3xl shadow-glow overflow-hidden">
+      <div class="p-12 text-center relative">
+        <!-- Shimmer effect -->
+        <div class="absolute inset-0 bg-shimmer animate-shimmer opacity-20"></div>
+        
+        <!-- Greeting with Better Text Sizing -->
+        <div class="relative z-10">
+          <h1 class="text-4xl md:text-5xl lg:text-6xl font-black font-display text-white tracking-tight mb-4 leading-tight">
+            Welcome back<span class="gradient-text-primary">, {{ name }}!</span>
+          </h1>
+          <p class="mt-6 text-lg md:text-xl text-gray-300 font-medium">Ready to revolutionize the supply chain?</p>
+        </div>
       </div>
 
-      <!-- Role Badge -->
+      <!-- Enhanced Role Badge with Better Visibility -->
       <div class="px-12 pb-12 text-center">
-        <p class="text-gray-400 text-sm uppercase tracking-wider mb-3">Current Role</p>
-        <span class="inline-flex items-center gap-3 px-8 py-4 bg-gradient-to-r from-purple-500/20 to-indigo-500/20 backdrop-blur-md border border-white/30 rounded-full text-white font-bold text-2xl shadow-lg">
-          <span class="w-3 h-3 bg-emerald-400 rounded-full animate-pulse"></span>
-          {{ role }}
-        </span>
+        <p class="text-gray-300 text-lg uppercase tracking-wider mb-6 font-bold">Current Role</p>
+        <div class="inline-flex items-center gap-4 px-12 py-6 glass-morph-light border-2 border-emerald-400/50 rounded-2xl text-white font-black text-3xl font-display shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 group">
+          <span class="w-4 h-4 bg-emerald-400 rounded-full animate-pulse shadow-lg group-hover:animate-bounce"></span>
+          <span class="gradient-text-primary tracking-wider">{{ role }}</span>
+          <svg class="w-8 h-8 text-emerald-400 group-hover:rotate-12 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"/>
+          </svg>
+        </div>
       </div>
     </div>
 
-    <!-- Action Buttons Card -->
-    <div class="mt-12 backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl shadow-2xl p-10">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <!-- Logout Button -->
-        <button
-          (click)="logout()"
-          class="group relative overflow-hidden rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 p-1 shadow-2xl transition-all duration-300 hover:scale-105 hover:shadow-purple-500/50">
+    <!-- Enhanced Action Buttons Card -->
+    <div class="mt-12 glass-morph border border-white/10 rounded-3xl shadow-glow p-10">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        
+        <!-- QR Scanner Button -->
+        <a routerLink="/scanner"
+           class="group relative overflow-hidden bg-gradient-to-r from-emerald-500/90 via-lime-500/90 to-emerald-600/90 hover:from-emerald-600 hover:via-lime-600 hover:to-emerald-700 rounded-2xl p-6 font-black text-white text-xl font-display shadow-2xl hover:shadow-emerald-500/50 transition-all duration-300 hover:scale-105 border-2 border-emerald-400/50 block">
           <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
-          <span class="relative block px-12 py-6 bg-slate-900/90 backdrop-blur-sm rounded-2xl font-bold text-white text-lg tracking-wide">
-            Logout
+          <span class="relative z-10 flex items-center justify-center gap-4">
+            <svg class="w-8 h-8 group-hover:animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M12 4v1m6 11h2m-6 5v1m-6-16H5a2 2 0 00-2 2v3m14-5h2a2 2 0 012 2v3m-9 9h.01" />
+            </svg>
+            <span class="font-display tracking-wide">Scan QR Code</span>
           </span>
-        </button>
+        </a>
+
+        <!-- My Products Button (for Distributors and Farmers) -->
+        <a *ngIf="isFarmer || isDistributor" routerLink="/products/my"
+           class="group relative overflow-hidden bg-gradient-to-r from-blue-500/90 via-cyan-500/90 to-blue-600/90 hover:from-blue-600 hover:via-cyan-600 hover:to-blue-700 rounded-2xl p-6 font-black text-white text-xl font-display shadow-2xl hover:shadow-blue-500/50 transition-all duration-300 hover:scale-105 border-2 border-blue-400/50 block">
+          <div class="absolute inset-0 bg-white/20 translate-y-full group-hover:translate-y-0 transition-transform duration-500"></div>
+          <span class="relative z-10 flex items-center justify-center gap-4">
+            <svg class="w-8 h-8 group-hover:animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M9 1h6v6H9z"/>
+            </svg>
+            <span class="font-display tracking-wide">My Products</span>
+          </span>
+        </a>
 
         <!-- Request Admin Access -->
         <button

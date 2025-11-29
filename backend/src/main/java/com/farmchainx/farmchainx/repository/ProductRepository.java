@@ -27,4 +27,36 @@ public interface ProductRepository extends JpaRepository<Product, Long> {
             @Param("cropName") String cropName,
             @Param("endDate") LocalDate endDate
     );
+
+    // Products available for distributors to pick up (not yet in supply chain)
+    @Query("SELECT p FROM Product p " +
+           "WHERE p.id NOT IN (" +
+           "    SELECT DISTINCT sc.productId FROM SupplyChainLog sc " +
+           ")")
+    Page<Product> findProductsAvailableForPickup(Pageable pageable);
+    
+    // Products currently owned/possessed by a specific distributor
+    @Query("SELECT DISTINCT p FROM Product p " +
+           "WHERE p.id IN (" +
+           "    SELECT sc1.productId FROM SupplyChainLog sc1 " +
+           "    WHERE sc1.toUserId = :distributorId " +
+           "    AND sc1.confirmed = true " +
+           "    AND NOT EXISTS (" +
+           "        SELECT 1 FROM SupplyChainLog sc2 " +
+           "        WHERE sc2.productId = sc1.productId " +
+           "        AND sc2.fromUserId = :distributorId " +
+           "        AND sc2.toUserId != :distributorId " +
+           "        AND sc2.confirmed = true " +
+           "        AND sc2.timestamp > sc1.timestamp" +
+           "    )" +
+           ")")
+    Page<Product> findProductsOwnedByDistributor(@Param("distributorId") Long distributorId, Pageable pageable);
+
+    // Products available to consumers (have reached retailers)  
+    @Query("SELECT DISTINCT p FROM Product p " +
+           "WHERE p.id IN (" +
+           "    SELECT DISTINCT sc.productId FROM SupplyChainLog sc " +
+           "    WHERE sc.confirmed = true" +
+           ")")
+    Page<Product> findProductsAvailableToConsumers(Pageable pageable);
 }

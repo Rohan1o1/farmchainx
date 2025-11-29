@@ -1,19 +1,41 @@
-<div class="min-h-screen bg-gradient-to-br from-slate-950 via-emerald-950 to-slate-950 text-white overflow-x-hidden">
-  <!-- Animated Background Blobs -->
-  <div class="fixed inset-0 -z-10 overflow-hidden pointer-events-none">
-    <div class="absolute top-0 left-0 w-96 h-96 bg-emerald-700 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob"></div>
-    <div class="absolute bottom-0 right-0 w-96 h-96 bg-lime-600 rounded-full mix-blend-multiply filter blur-3xl opacity-40 animate-blob animation-delay-2000"></div>
+<div class="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-950 text-white overflow-x-hidden">
+  <!-- Background Enhancement -->
+  <div class="fixed inset-0 -z-10 overflow-hidden">
+    <div class="absolute top-0 left-0 w-96 h-96 bg-emerald-700 rounded-full mix-blend-multiply filter blur-3xl opacity-30 animate-blob"></div>
+    <div class="absolute bottom-0 right-0 w-96 h-96 bg-teal-600 rounded-full mix-blend-multiply filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
   </div>
-
-  <div class="max-w-7xl mx-auto px-6 py-16">
+  
+  <div class="relative z-10 max-w-7xl mx-auto px-6 py-16">
     <!-- Header -->
     <div class="text-center mb-20">
       <h1 class="text-7xl md:text-9xl font-black tracking-tighter bg-clip-text text-transparent bg-gradient-to-r from-emerald-400 via-lime-400 to-emerald-400">
-        My Products
+        <span *ngIf="!isAdmin()">My Products</span>
+        <span *ngIf="isAdmin()">All Products</span>
       </h1>
       <p class="text-2xl mt-6 text-gray-300 font-medium">
-        Your harvest, forever on the blockchain — trusted by the world
+        <span *ngIf="!isAdmin()">Your harvest, forever on the blockchain — trusted by the world</span>
+        <span *ngIf="isAdmin()">Admin view: All products in the system</span>
       </p>
+    </div>
+
+    <!-- Distributor Toggle Buttons -->
+    <div *ngIf="isDistributor()" class="flex justify-center mb-12">
+      <div class="backdrop-blur-xl bg-white/10 border border-white/20 rounded-2xl p-2 flex gap-2">
+        <button (click)="switchToOwnedProducts()" 
+                [disabled]="loading"
+                [class]="viewMode === 'owned' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-xl' : 'text-gray-300 hover:text-white'"
+                class="px-8 py-4 rounded-xl font-bold text-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
+          <span *ngIf="loading && viewMode === 'owned'">🔄 Loading...</span>
+          <span *ngIf="!loading || viewMode !== 'owned'">My Inventory</span>
+        </button>
+        <button (click)="switchToPickupProducts()" 
+                [disabled]="loading"
+                [class]="viewMode === 'pickup' ? 'bg-gradient-to-r from-emerald-500 to-teal-600 text-white shadow-xl' : 'text-gray-300 hover:text-white'"
+                class="px-8 py-4 rounded-xl font-bold text-lg transition disabled:opacity-50 disabled:cursor-not-allowed">
+          <span *ngIf="loading && viewMode === 'pickup'">🔄 Loading...</span>
+          <span *ngIf="!loading || viewMode !== 'pickup'">Available for Pickup</span>
+        </button>
+      </div>
     </div>
 
     <!-- Loading -->
@@ -29,97 +51,126 @@
       {{ retryMessage }}
     </div>
 
-    <!-- No Products -->
+    <!-- Enhanced No Products State -->
     <div *ngIf="!loading && products.length === 0" class="text-center py-32">
-      <div class="text-9xl mb-8">Empty</div>
-      <h2 class="text-6xl font-black text-gray-500 mb-6">No Products Yet</h2>
-      <p class="text-2xl text-gray-400">Time to upload your first harvest to the blockchain!</p>
+      <div class="backdrop-blur-xl bg-slate-800/80 border-2 border-emerald-500/30 rounded-3xl p-16 max-w-2xl mx-auto">
+        <div class="text-8xl mb-8">📦</div>
+        <h2 class="text-4xl font-black text-emerald-400 mb-6">
+          <span *ngIf="isDistributor() && viewMode === 'pickup'">No Products Available for Pickup</span>
+          <span *ngIf="!isDistributor() || viewMode === 'owned'">No Products Yet</span>
+        </h2>
+        <p class="text-xl text-gray-300 mb-8">
+          <span *ngIf="isDistributor() && viewMode === 'pickup'">Check back later for products available for pickup</span>
+          <span *ngIf="!isDistributor() || viewMode === 'owned'">Your harvest inventory is empty</span>
+        </p>
+      </div>
     </div>
 
-    <!-- Product Grid -->
+    <!-- Enhanced Product Grid -->
     <div *ngIf="products.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
       <div *ngFor="let p of products" 
-           class="group relative backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl overflow-hidden shadow-2xl hover:shadow-emerald-500/20 transition-all duration-500 hover:scale-[1.02]">
+           class="group relative backdrop-blur-xl bg-slate-800/80 border-2 border-emerald-500/30 rounded-3xl overflow-hidden shadow-2xl hover:shadow-emerald-500/40 transition-all duration-500 hover:scale-[1.02] hover:border-emerald-400/50">
 
-        <!-- Hero Image + Emoji -->
-        <div class="relative h-96 overflow-hidden">
+        <!-- Click Indicator for Verification -->
+        <div class="absolute top-4 right-4 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <div class="bg-blue-500/90 backdrop-blur-sm rounded-full p-2 shadow-lg">
+            <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+          </div>
+        </div>
+
+        <!-- Enhanced Hero Image + Emoji -->
+        <div class="relative h-96 overflow-hidden bg-slate-700/50">
           <img [src]="getImageUrl(p.imagePath)" [alt]="p.cropName"
-               class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110">
-          <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent"></div>
+               class="w-full h-full object-cover transition-transform duration-1000 group-hover:scale-110 opacity-80"
+               (error)="$event.target.style.display='none'">
+          <div class="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-800/50 to-transparent"></div>
 
-          <!-- Giant Floating Emoji -->
+          <!-- Enhanced Giant Floating Emoji -->
           <div class="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <div class="text-[180px] md:text-[240px] drop-shadow-2xl animate-pulse-slow">
+            <div class="text-[120px] md:text-[160px] drop-shadow-2xl animate-pulse-slow filter brightness-110">
               {{ getCropEmoji(p.cropName) }}
             </div>
           </div>
 
-          <!-- Crop Name + Date -->
-          <div class="absolute bottom-8 left-8 right-8">
-            <h3 class="text-6xl md:text-7xl font-black drop-shadow-2xl leading-none">
+          <!-- Enhanced Crop Name + Date -->
+          <div class="absolute bottom-6 left-6 right-6">
+            <h3 (click)="viewProduct(p); $event.stopPropagation()" 
+                class="text-4xl md:text-5xl font-black text-white drop-shadow-2xl leading-tight bg-slate-900/70 px-4 py-2 rounded-xl backdrop-blur-sm cursor-pointer hover:bg-blue-600/70 hover:scale-105 transition-all duration-300 border-2 border-transparent hover:border-blue-400/50">
               {{ p.cropName | titlecase }}
+              <span class="ml-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300 text-blue-400">🔍</span>
             </h3>
-            <p class="text-2xl mt-3 opacity-90 font-medium">
-              Harvested {{ formatDate(p.harvestDate) }}
+            <p class="text-lg mt-2 text-emerald-200 font-semibold bg-slate-900/60 px-3 py-1 rounded-lg backdrop-blur-sm inline-block">
+              Harvested {{ formatDate(p.harvestDate) }} 
+              <span class="ml-2 text-xs text-blue-300 opacity-0 group-hover:opacity-100 transition-opacity duration-300">Click to verify →</span>
             </p>
           </div>
         </div>
 
-        <!-- Card Body -->
-        <div class="p-10 space-y-8">
-          <!-- AI Quality Badge -->
-          <div class="flex justify-center -mt-20 mb-10">
-            <div class="backdrop-blur-xl bg-gradient-to-br from-emerald-500/90 to-teal-600/90 px-12 py-8 rounded-3xl border-4 border-white/30 shadow-2xl">
-              <div class="text-8xl font-black">{{ p.qualityGrade || 'A+' }}</div>
-              <div class="text-xl font-bold text-emerald-200">
+        <!-- Enhanced Card Body -->
+        <div class="p-8 space-y-6 bg-slate-800/90 backdrop-blur-sm">
+          <!-- Enhanced AI Quality Badge -->
+          <div class="flex justify-center -mt-16 mb-8">
+            <div class="backdrop-blur-xl bg-gradient-to-br from-emerald-500/95 to-teal-600/95 px-8 py-6 rounded-2xl border-2 border-emerald-400/50 shadow-2xl">
+              <div class="text-5xl font-black text-white text-center">{{ p.qualityGrade || 'A+' }}</div>
+              <div class="text-sm font-bold text-emerald-100 text-center mt-1">
                 AI Certified • {{ p.confidenceScore | number:'1.0-0' }}% Confidence
               </div>
             </div>
           </div>
 
-          <!-- Farmer Info -->
-          <div class="text-center space-y-2">
-            <p class="text-gray-400 uppercase tracking-wider text-sm">Registered By</p>
-            <p class="text-2xl font-bold">{{ p.farmer?.name || 'You' }}</p>
-            <p class="text-sm font-mono text-gray-500">ID #{{ p.id }} • {{ p.publicUuid?.substring(0, 8) }}...</p>
+          <!-- Enhanced Farmer Info -->
+          <div class="text-center space-y-2 bg-slate-700/50 p-4 rounded-xl">
+            <p class="text-emerald-300 uppercase tracking-wider text-sm font-bold">Registered By</p>
+            <p class="text-xl font-bold text-white">{{ p.farmer?.name || 'You' }}</p>
+            <p class="text-xs font-mono text-emerald-200 bg-slate-600/50 px-3 py-1 rounded-lg inline-block">ID #{{ p.id }} • {{ p.publicUuid?.substring(0, 8) }}...</p>
           </div>
 
-          <!-- QR Status -->
-          <div class="text-center py-6">
-            <p class="text-sm uppercase tracking-widest text-gray-400 mb-4">QR Code Status</p>
+          <!-- Enhanced QR Status -->
+          <div class="text-center py-4 bg-slate-700/50 rounded-xl">
+            <p class="text-xs uppercase tracking-widest text-emerald-300 mb-3 font-bold">QR Code Status</p>
             <div class="flex justify-center">
-              <span *ngIf="p.qrCodePath" class="text-4xl font-black text-emerald-400 flex items-center gap-4">
-                Ready
+              <span *ngIf="p.qrCodePath" class="text-3xl font-black text-emerald-400 flex items-center gap-3 bg-emerald-900/30 px-4 py-2 rounded-lg">
+                ✓ Ready
               </span>
-              <span *ngIf="!p.qrCodePath" class="text-4xl font-black text-orange-400">
-                Generate First
+              <span *ngIf="!p.qrCodePath" class="text-3xl font-black text-orange-400 flex items-center gap-3 bg-orange-900/30 px-4 py-2 rounded-lg">
+                ⚠ Generate First
               </span>
             </div>
           </div>
 
-          <!-- Action Buttons -->
-          <div class="grid grid-cols-2 gap-5">
-            <button *ngIf="!p.qrCodePath" (click)="generateQr(p.id)"
-                    class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-xl py-5 rounded-2xl shadow-xl transform hover:scale-110 transition">
-              Generate QR
+          <!-- Enhanced Action Buttons -->
+          <div class="grid grid-cols-1 gap-3">
+            <button *ngIf="!p.qrCodePath" (click)="generateQr(p.id); $event.stopPropagation()"
+                    class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white font-black text-lg py-4 rounded-xl shadow-xl transform hover:scale-105 transition border-2 border-emerald-400/30">
+              🔄 Generate QR Code
             </button>
 
-            <button *ngIf="p.qrCodePath" (click)="downloadQr(p.id)"
-                    class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-black text-xl py-5 rounded-2xl shadow-xl transform hover:scale-110 transition">
-              Download
+            <button *ngIf="p.qrCodePath" (click)="downloadQr(p.id); $event.stopPropagation()"
+                    class="bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-600 hover:to-blue-700 text-white font-black text-lg py-4 rounded-xl shadow-xl transform hover:scale-105 transition border-2 border-cyan-400/30">
+              📥 Download QR
+            </button>
+
+            <!-- Enhanced Full QR View Button -->
+            <a *ngIf="p.qrCodePath" [href]="getQrUrl(p.qrCodePath)" target="_blank" (click)="$event.stopPropagation()"
+               class="block text-center bg-slate-600/80 hover:bg-slate-500/90 backdrop-blur-md border-2 border-slate-400/30 py-4 rounded-xl font-bold text-lg transition text-white hover:text-emerald-300">
+              👁️ View Full QR Code
+            </a>
+
+            <!-- View Verification Button -->
+            <button (click)="viewProduct(p); $event.stopPropagation()"
+                    class="bg-gradient-to-r from-blue-500/90 to-indigo-600/90 hover:from-blue-600 hover:to-indigo-700 text-white font-black text-lg py-4 rounded-xl shadow-xl transform hover:scale-105 transition border-2 border-blue-400/30">
+              � View Verification
             </button>
           </div>
 
-          <!-- Full QR View Button -->
-          <a *ngIf="p.qrCodePath" [href]="getQrUrl(p.qrCodePath)" target="_blank"
-             class="block text-center bg-white/10 hover:bg-white/20 backdrop-blur-md border border-white/30 py-5 rounded-2xl font-bold text-xl transition">
-            View Full QR Code
-          </a>
-
-          <!-- QR Preview -->
-          <div *ngIf="p.qrCodePath" class="bg-white/5 rounded-3xl p-8 border border-white/10">
-            <img [src]="getQrUrl(p.qrCodePath)" alt="QR" class="w-full max-w-xs mx-auto rounded-2xl shadow-2xl">
-            <p class="text-center mt-6 text-lg font-medium text-gray-300">Scan to verify on blockchain</p>
+          <!-- Enhanced QR Preview -->
+          <div *ngIf="p.qrCodePath" class="bg-slate-600/50 rounded-2xl p-6 border-2 border-emerald-500/20">
+            <div class="bg-white p-4 rounded-xl shadow-2xl">
+              <img [src]="getQrUrl(p.qrCodePath)" alt="QR Code" class="w-full max-w-48 mx-auto rounded-lg">
+            </div>
+            <p class="text-center mt-4 text-base font-semibold text-emerald-200">📱 Scan to verify authenticity</p>
           </div>
         </div>
       </div>

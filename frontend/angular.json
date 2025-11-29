@@ -64,6 +64,9 @@
         },
         "serve": {
           "builder": "@angular/build:dev-server",
+          "options": {
+            "proxyConfig": "proxy.conf.json"
+          },
           "configurations": {
             "production": {
               "buildTarget": "farmchainx-frontend:build:production"
@@ -105,6 +108,5 @@
   },
   "cli": {
     "analytics": false
-  },
-  "defaultProject": "farmchainx-frontend"
+  }
 }
