@@ -43,7 +43,7 @@ Complete deployment guide for FarmChainX with Frontend on Netlify and Backend on
    - **Base directory**: `frontend`
    - **Build command**: `npm install && npx ng build --configuration production`
    - **Publish directory**: `dist/farmchainx-frontend`
-   - **Environment**: Node.js 18.x
+   - **Environment**: Node.js 20.x
 
 3. **Advanced Build Settings**
    Netlify will automatically use `netlify.toml` for configuration including:
