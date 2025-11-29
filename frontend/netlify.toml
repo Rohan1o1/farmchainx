@@ -3,10 +3,10 @@
 
 [build]
   # Build command to run
-  command = "npm run build:prod"
+  command = "npm install && npm run build:prod"
   
   # Directory to publish (Angular dist folder)
-  publish = "dist/farmchainx"
+  publish = "dist/farmchainx-frontend"
   
   # Base directory for build (if different from root)
   base = "frontend"
