@@ -1,0 +1,37 @@
+version: "1"
+
+services:
+  - type: web
+    name: farmchainx-backend
+    env: java
+    plan: free
+    buildCommand: "./mvnw clean package -DskipTests"
+    startCommand: "java -Dserver.port=$PORT -jar target/farmchainx-1.0.0.jar"
+    envVars:
+      - key: JAVA_TOOL_OPTIONS
+        value: "-Xmx512m"
+      - key: SPRING_PROFILES_ACTIVE
+        value: "production"
+      - key: DATABASE_URL
+        fromDatabase:
+          name: farmchainx-db
+          property: connectionString
+      - key: DB_USERNAME
+        fromDatabase:
+          name: farmchainx-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: farmchainx-db
+          property: password
+      - key: CLOUDINARY_CLOUD_NAME
+        value: "your_cloudinary_cloud_name"  # Replace with your Cloudinary cloud name
+      - key: CLOUDINARY_API_KEY
+        value: "your_cloudinary_api_key"     # Replace with your Cloudinary API key
+      - key: CLOUDINARY_API_SECRET
+        value: "your_cloudinary_api_secret"  # Replace with your Cloudinary API secret
+
+databases:
+  - name: farmchainx-db
+    databaseName: farmchainx
+    user: farmchainx_user
