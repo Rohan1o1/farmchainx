@@ -1,6 +1,17 @@
 {
   "name": "farmchainx-frontend",
-  "version": "0.0.0",
+  "version": "1.0.0",
+  "description": "FarmChainX - Blockchain-Powered Agricultural Traceability Frontend",
+  "license": "MIT",
+  "author": "FarmChainX Contributors",
+  "homepage": "https://github.com/Rohan1o1/farmchainx",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Rohan1o1/farmchainx.git"
+  },
+  "bugs": {
+    "url": "https://github.com/Rohan1o1/farmchainx/issues"
+  },
   "scripts": {
     "ng": "ng",
     "start": "ng serve",

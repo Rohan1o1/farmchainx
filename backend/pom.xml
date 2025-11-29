@@ -10,21 +10,28 @@
 	</parent>
 	<groupId>com.farmchainx</groupId>
 	<artifactId>farmchainx</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
-	<name>Farm Chain X Project</name>
-	<description>creating farmchainx to help farmers</description>
-	<url/>
+	<version>1.0.0</version>
+	<name>FarmChainX</name>
+	<description>Blockchain-Powered Agricultural Traceability System</description>
+	<url>https://github.com/Rohan1o1/farmchainx</url>
 	<licenses>
-		<license/>
+		<license>
+			<name>MIT License</name>
+			<url>https://opensource.org/licenses/MIT</url>
+			<distribution>repo</distribution>
+		</license>
 	</licenses>
 	<developers>
-		<developer/>
+		<developer>
+			<name>FarmChainX Contributors</name>
+			<url>https://github.com/Rohan1o1/farmchainx/contributors</url>
+		</developer>
 	</developers>
 	<scm>
-		<connection/>
-		<developerConnection/>
-		<tag/>
-		<url/>
+		<connection>scm:git:git://github.com/Rohan1o1/farmchainx.git</connection>
+		<developerConnection>scm:git:ssh://github.com:Rohan1o1/farmchainx.git</developerConnection>
+		<tag>HEAD</tag>
+		<url>https://github.com/Rohan1o1/farmchainx</url>
 	</scm>
 	<properties>
 		<java.version>17</java.version>
