@@ -27,19 +27,6 @@
   from = "/*"
   to = "/index.html"
   status = 200
-  
-  # Conditions for the redirect
-  conditions = {Role = ["admin", "visitor"]}
-
-# API proxy rules (if needed for development)
-[[redirects]]
-  from = "/api/*"
-  to = "https://your-backend-url.render.com/api/:splat"
-  status = 200
-  force = false
-  
-  # Headers for CORS
-  headers = {Access-Control-Allow-Origin = "*"}
 
 # Security headers
 [[headers]]
@@ -50,9 +37,6 @@
     X-Content-Type-Options = "nosniff"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    
-    # Content Security Policy (adjust as needed)
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:; font-src 'self' data:; connect-src 'self' https://your-backend-url.render.com;"
 
 # Cache control for static assets
 [[headers]]
@@ -83,44 +67,3 @@
 
 [context.deploy-preview]
   command = "npm run build"
-
-# Form handling (if you have contact forms)
-[forms]
-  # Enable Netlify Forms
-  [forms.contact]
-    action = "/thank-you"
-    method = "POST"
-
-# Functions (if you need serverless functions)
-[functions]
-  directory = "functions"
-  node_bundler = "esbuild"
-
-# Plugin configuration
-[[plugins]]
-  package = "netlify-plugin-angular-universal"
-  
-  [plugins.inputs]
-    # Angular Universal SSR support (optional)
-    serverTarget = "build:ssr"
-    staticTarget = "build:static"
-
-# Prerender configuration (for better SEO)
-[build.processing]
-  skip_processing = false
-
-[build.processing.css]
-  bundle = true
-  minify = true
-
-[build.processing.js]
-  bundle = true
-  minify = true
-
-[build.processing.html]
-  pretty_urls = true
-
-# Edge functions (if needed)
-[edge_functions]
-  # Example: API rate limiting
-  # "/api/*" = "rate-limiter"
